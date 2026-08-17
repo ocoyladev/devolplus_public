@@ -40,6 +40,11 @@ SUSTITUCIONES: tuple[tuple[str, str], ...] = (
     ("sunat", "acme"),
     ("REPUBLICA DEL PERU", "REPUBLICA DE EJEMPLO"),
     ("REPÚBLICA DEL PERÚ", "REPÚBLICA DE EJEMPLO"),
+    # Referencias a la jurisdicción dentro del cuerpo del texto: no identifican a
+    # ninguna organización, pero se sustituyen igual para que el verificador
+    # quede sin hallazgos conocidos y siga sirviendo como control binario.
+    ("domiciliado en Perú", "domiciliado en el país"),
+    ("domiciliado en el Perú", "domiciliado en el país"),
 )
 
 # Metadata que se vacía por completo.
@@ -110,11 +115,29 @@ def neutralizar(origen: Path, destino: Path | None = None) -> dict:
 
 
 def verificar(ruta: Path) -> list[str]:
-    """Devuelve los hallazgos residuales de un .docx ya neutralizado."""
+    """Devuelve los hallazgos residuales de un .docx ya neutralizado.
+
+    Comprueba las tres vías por las que se filtra información: metadata de
+    autoría, imágenes embebidas y texto de las partes XML. La metadata es la
+    más fácil de pasar por alto, porque no se ve al abrir el documento.
+    """
     patron = re.compile(r"sunat|superintendencia|intendencia lima|per[uú]", re.I)
     hallazgos: list[str] = []
     with zipfile.ZipFile(ruta) as z:
-        for nombre in z.namelist():
+        nombres = z.namelist()
+
+        # 1) Metadata de autoría: debe estar vacía, no solo libre de marcas.
+        for meta in ("docProps/core.xml", "docProps/app.xml"):
+            if meta not in nombres:
+                continue
+            xml = z.read(meta).decode("utf8", "ignore")
+            for campo in CAMPOS_META:
+                m = re.search(rf"<{campo}[^>]*>(.*?)</{campo}>", xml, flags=re.S)
+                if m and m.group(1).strip():
+                    hallazgos.append(f"{meta}: {campo} = {m.group(1).strip()!r}")
+
+        # 2) Imágenes embebidas y 3) texto de las partes XML.
+        for nombre in nombres:
             if nombre.startswith("word/media/"):
                 datos = z.read(nombre)
                 if datos != _PNG_PLACEHOLDER:

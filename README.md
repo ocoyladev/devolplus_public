@@ -1,21 +1,21 @@
 # DEVOL+
 
-Aplicación de escritorio para automatizar un back-office de procesamiento
-documental: carga de expedientes, descarga de artefactos, generación de
-resoluciones y cartas por combinación de plantillas, validación previa al
-archivo y registro de tickets en una mesa de ayuda.
+A desktop application that automates a document-processing back office: loading
+case files, fetching supporting artifacts, generating letters and resolutions by
+mail-merging templates, running pre-archive validation, and filing service-desk
+tickets.
 
-Backend en **Python (FastAPI)**, frontend en **React + TypeScript (Vite)**, y un
-ejecutable único de Windows empaquetado con **PyInstaller** que embebe el
-frontend compilado y abre una ventana nativa (`pywebview`).
+Python **FastAPI** backend, **React + TypeScript (Vite)** frontend, packaged into
+a single Windows executable with **PyInstaller** that embeds the compiled
+frontend and opens a native window via `pywebview`.
 
-> **Esta es una distribución de demostración.** Corre de punta a punta sin
-> ninguna infraestructura: sin red, sin base de datos corporativa y con datos
-> sintéticos. Ver [Modo demo](#modo-demo).
+> **This is a demonstration distribution.** It runs end to end with no
+> infrastructure at all — no network, no corporate database, and synthetic data
+> throughout. See [Demo mode](#demo-mode).
 
 ---
 
-## Arranque rápido
+## Quick start
 
 ```bash
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
@@ -26,153 +26,160 @@ cd frontend && npm install && npm run build && cd ..
 python run_web.py
 ```
 
-Abre <http://127.0.0.1:8000>. No hay que crear usuarios ni pedir accesos: en
-modo demo cualquier usuario entra directamente.
+Open <http://127.0.0.1:8000>. There is no sign-up and no access request: in demo
+mode every user is admitted straight away.
 
-Para sembrar la tabla con casos sintéticos:
+Seed the case table with synthetic records:
 
 ```bash
-python -m demo.seed        # 60 casos deterministas
+python -m demo.seed        # 60 deterministic cases
 ```
 
 ### Tests
 
 ```bash
-pytest                     # backend + demo
+pytest                              # backend + demo helpers
 cd frontend && npx tsc -b && npm test
 ```
 
 ---
 
-## Arquitectura
+## Architecture
 
 ```
 ┌─────────────────┐   HTTP + WebSocket   ┌──────────────────────────────┐
 │  React (Vite)   │ ───────────────────► │  FastAPI (MACRO/app)         │
 │  frontend/      │ ◄─────────────────── │  routers → schemas → jobs    │
-└─────────────────┘   eventos progress   └──────────────┬───────────────┘
+└─────────────────┘   progress events    └──────────────┬───────────────┘
                                                         │
                                          ┌──────────────▼───────────────┐
-                                         │  MACRO/flujos  (orquestación)│
+                                         │  MACRO/flujos  (orchestration)│
                                          └──────────────┬───────────────┘
                                                         │
                                          ┌──────────────▼───────────────┐
                                          │  MACRO/adapters              │
                                          │  BackofficeAdapter (Protocol)│
-                                         │  └─ DemoAdapter (sin red)    │
+                                         │  └─ DemoAdapter (no network) │
                                          └──────────────────────────────┘
 ```
 
-| Capa | Ruta | Responsabilidad |
+| Layer | Path | Responsibility |
 |---|---|---|
-| API | `MACRO/app/routers/` | endpoints delgados; sin lógica de negocio |
-| Contratos | `MACRO/app/schemas/` | modelos Pydantic de request/response |
-| Jobs | `MACRO/app/jobs.py` | tareas en background + progreso por WebSocket |
-| Flujos | `MACRO/flujos/` | orquestación por caso de uso |
-| Adaptador | `MACRO/adapters/` | frontera con el sistema externo |
-| Dominio | `MACRO/funciones/`, `MACRO/itop/` | Excel, PDF, foliado, tickets, cartas |
-| Acceso | `MACRO/auth/` | validación de usuarios y caché offline |
-| Persistencia | `MACRO/database.py` | SQLite local |
+| API | `MACRO/app/routers/` | thin endpoints, no business logic |
+| Contracts | `MACRO/app/schemas/` | Pydantic request/response models |
+| Jobs | `MACRO/app/jobs.py` | background tasks with WebSocket progress |
+| Flows | `MACRO/flujos/` | one module per use case |
+| Adapter | `MACRO/adapters/` | boundary with the external system |
+| Domain | `MACRO/funciones/` | spreadsheets, PDFs, pagination, letters, ticket payloads |
+| Access | `MACRO/auth/` | user validation and offline cache |
+| Storage | `MACRO/database.py` | local SQLite |
 
-Puntos que vale la pena mirar:
+Worth a look:
 
-- **Jobs con progreso** (`MACRO/app/jobs.py`): las tareas largas corren en un
-  hilo y publican eventos por WebSocket; el frontend los consume en
+- **Jobs with live progress** (`MACRO/app/jobs.py`) — long tasks run on a worker
+  thread and publish events over a WebSocket; the frontend consumes them in
   `frontend/src/ws/useProgreso.ts`.
-- **Caché de acceso offline** (`MACRO/auth/cache_local.py`): si la base de
-  accesos no responde, un usuario ya aprobado entra igual y su logueo queda
-  encolado para sincronizar después.
-- **Versión en runtime** (`MACRO/version.py`): el `.exe` embebe el archivo
-  `VERSION` y el frontend la consulta por `GET /api/version`, así el build del
-  frontend no depende de la versión.
-- **Generación documental** (`MACRO/flujos/flujo_documentos.py`): combina campos
-  sobre plantillas `.docx` en `MACRO/RESOURCES/`.
+- **Offline access cache** (`MACRO/auth/cache_local.py`) — when the access
+  database is unreachable, an already-approved user still gets in and their
+  login is queued for later reconciliation.
+- **Runtime versioning** (`MACRO/version.py`) — the executable embeds the
+  `VERSION` file and the frontend reads it from `GET /api/version`, so the
+  frontend build never has to be rebuilt for a version bump.
+- **Document generation** (`MACRO/flujos/flujo_documentos.py`) — merges case
+  fields into `.docx` templates under `MACRO/RESOURCES/`.
+
+The codebase is written in Spanish (identifiers, docstrings, and UI strings),
+matching the domain it models.
 
 ---
 
-## Modo demo
+## Demo mode
 
-Esta distribución no incluye ningún cliente de sistema externo. En su lugar:
+This distribution ships no client for any external system. Instead:
 
-| Pieza | Comportamiento |
+| Piece | Behaviour |
 |---|---|
-| `BACKOFFICE_ADAPTER=demo` | `DemoAdapter` resuelve todo en local, con latencia simulada para que el progreso sea observable |
-| `AUTH_MODE=demo` | cualquier usuario queda aprobado; no se abre conexión a ninguna base |
-| `demo/seed.py` | 60 casos sintéticos deterministas |
-| `MACRO/RESOURCES/` | plantillas de ejemplo, neutralizadas |
+| `BACKOFFICE_ADAPTER=demo` | `DemoAdapter` resolves everything locally, with simulated latency so progress is observable |
+| `AUTH_MODE=demo` | every user is approved; no database connection is opened |
+| `demo/seed.py` | 60 deterministic synthetic cases |
+| `MACRO/RESOURCES/` | sample templates, sanitised |
 
-### Los datos son sintéticos por construcción
+### The data is synthetic by construction
 
-Los RUC generados llevan **dígito verificador inválido a propósito**: conservan
-la forma real (11 dígitos, prefijo `10`/`20`) pero fallan la validación módulo
-11, así que no pueden corresponder a ningún contribuyente inscrito. Hay un test
-que lo verifica como invariante:
+Generated taxpayer IDs carry a **deliberately invalid check digit**. They keep
+the real shape (11 digits, `10`/`20` prefix) but fail the modulo-11 checksum, so
+none of them can match a registered taxpayer. This is pinned as an invariant:
 
 ```
 demo/tests/test_seed.py::test_ningun_ruc_generado_es_valido
 ```
 
-Los nombres se componen de listas de apellidos y nombres comunes; cualquier
-coincidencia con una persona real es casual y no proviene de ningún registro.
+Names are assembled from lists of common surnames and given names. Any
+resemblance to a real person is coincidental and comes from no registry.
 
-### Plantillas
+### Templates
 
-Las plantillas `.docx` de `MACRO/RESOURCES/` son ejemplos con campos de
-combinación (`MERGEFIELD`), sin datos de ninguna persona. Fueron procesadas con
-`demo/neutralizar_plantillas.py`, que vacía la metadata de autoría, sustituye
-las imágenes embebidas y reemplaza las referencias a cualquier organización:
+The `.docx` files under `MACRO/RESOURCES/` are sample mail-merge templates
+(`MERGEFIELD` placeholders) containing nobody's data. They were processed with
+`demo/neutralizar_plantillas.py`, which clears authorship metadata, replaces
+embedded images, and rewrites any organisation references:
 
 ```bash
 python -m demo.neutralizar_plantillas MACRO/RESOURCES --verificar
 ```
 
-### Conectar un back-office real
+Run that check after touching any template. A `.docx` is a ZIP, and two of the
+three leak paths — `docProps/*.xml` authorship fields and `word/media/*` embedded
+images — are invisible when you open the file in a word processor.
 
-Implementar el `Protocol` de `MACRO/adapters/__init__.py` y registrarlo en
-`get_adapter()`. Ningún otro módulo necesita cambiar: los flujos, los routers,
-los esquemas y el frontend son agnósticos del origen de los datos.
+### Wiring up a real back office
+
+Implement the `Protocol` in `MACRO/adapters/__init__.py` and register it in
+`get_adapter()`. Nothing else changes: the flows, routers, schemas, and frontend
+are agnostic about where the data comes from.
 
 ---
 
-## Empaquetado (Windows)
+## Packaging (Windows)
 
-El `.exe` embebe `frontend/dist`, así que **hay que compilar el frontend antes**
-o el ejecutable queda con una versión vieja:
+The executable embeds `frontend/dist`, so **the frontend must be built first** or
+the `.exe` ships a stale UI:
 
 ```bash
 cd frontend && npm run build     # → frontend/dist
 pyinstaller packaging/devolplus.spec
 ```
 
-Atajo que hace ambos pasos y fija la versión:
+One command that does both and stamps the version:
 
 ```bash
 python build.py --version 1.0.1
 ```
 
-Detalles en [`packaging/BUILD_WINDOWS.md`](packaging/BUILD_WINDOWS.md).
+Details in [`packaging/BUILD_WINDOWS.md`](packaging/BUILD_WINDOWS.md).
 
 ---
 
-## Limitaciones conocidas
+## Known limitations
 
-Cosas que en esta base de código están resueltas de forma deliberadamente
-simple, y que conviene mirar antes de reutilizarlas:
+Things this codebase solves deliberately simply — worth understanding before
+reusing them:
 
-- **Almacenamiento de credenciales** (`MACRO/database.py`): las contraseñas de
-  los sistemas externos se guardan con XOR reversible sobre una clave leída de
-  `DEVOL_XOR_KEY`. Es **ofuscación, no cifrado**: protege de una lectura casual
-  del archivo, no de un atacante con acceso al disco. Para uso real, sustituir
-  por el keyring del sistema operativo (`keyring`, que en Windows usa DPAPI) o,
-  mejor, no persistir la contraseña y pedirla una vez por sesión.
-- **Licenciamiento local** (`MACRO/seguridad.py`): la clave es un hash del
-  usuario con un salt de entorno. Sirve para evitar ejecuciones accidentales,
-  no como control de seguridad.
-- **RSIRAT**: la automatización de escritorio (`pywinauto`) es solo Windows y no
-  forma parte de esta distribución.
+- **Credential storage** (`MACRO/database.py`): passwords for external systems
+  are stored with a reversible XOR over a key read from `DEVOL_XOR_KEY`. That is
+  **obfuscation, not encryption**: it defeats a casual look at the file, not an
+  attacker with disk access. For production use, switch to the OS keyring
+  (`keyring`, which maps to DPAPI on Windows) or, better, don't persist the
+  password at all and prompt once per session.
+- **Local licensing** (`MACRO/seguridad.py`): the key is a hash of the username
+  plus a salt from the environment. It prevents accidental runs; it is not a
+  security control.
+- **Desktop automation**: one flow drives a legacy desktop application through
+  the Windows UI automation API. It is Windows-only and is not part of this
+  distribution — the demo adapter stands in for it.
 
 ---
 
-## Licencia
+## License
 
-MIT. Ver [`LICENSE`](LICENSE).
+MIT. See [`LICENSE`](LICENSE).
