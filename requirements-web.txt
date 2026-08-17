@@ -1,13 +1,30 @@
+# --- Servidor y ventana de escritorio ---
 fastapi==0.115.*
 uvicorn[standard]==0.32.*
 pywebview==5.*
-pyinstaller==6.*
 python-multipart==0.0.*
-httpx==0.27.*
-oracledb>=2.0.0
+
+# --- Datos y documentos ---
+# Los importan MACRO/funciones (Excel, PDF, foliado) y MACRO/flujos; sin ellas la
+# tabla de casos y el sembrado de datos fallan con ModuleNotFoundError.
+pandas>=2.0
+openpyxl>=3.1
+reportlab>=4.0
+PyPDF2>=3.0
+
+# --- Configuración ---
 python-dotenv>=1.0.0
+
+# --- Base de accesos corporativa (solo con AUTH_MODE=oracle) ---
+# El import está diferido: en modo demo la aplicación nunca la carga.
+oracledb>=2.0.0
+
+# --- Empaquetado y pruebas ---
+pyinstaller==6.*
 pytest>=8
-# Automatización de escritorio sistema legacy (SISTEMA_LEGACY: REF/Tiempos, Antecedentes). Solo
-# Windows (pywinauto arrastra pywin32); marcadores para no romper pip en Linux.
+httpx==0.27.*
+
+# --- Automatización de escritorio (solo Windows) ---
+# Marcadores de entorno para no romper pip en Linux/macOS.
 pywinauto; sys_platform == "win32"
 pyautogui; sys_platform == "win32"
