@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
-  listarArchivarEchasqui,
-  eliminarArchivarEchasqui,
-  ejecutarArchivarEchasqui,
-  type PendienteArchivoEchasqui,
+  listarArchivarRepositorio,
+  eliminarArchivarRepositorio,
+  ejecutarArchivarRepositorio,
+  type PendienteArchivoRepositorio,
 } from "../../api/mantenimiento";
 import { useTareaLock } from "../tareas/tareaLock";
 
@@ -15,18 +15,18 @@ interface Props {
   onJobIniciado: (kind: string) => void;
 }
 
-export function ArchivarEchasquiPanel({
+export function ArchivarRepositorioPanel({
   abierto,
   onCerrar,
   onAviso,
   onJobIniciado,
 }: Props): JSX.Element | null {
-  const [filas, setFilas] = useState<PendienteArchivoEchasqui[]>([]);
+  const [filas, setFilas] = useState<PendienteArchivoRepositorio[]>([]);
   const [sel, setSel] = useState<Set<number>>(new Set());
   const { ocupado, iniciar, terminar } = useTareaLock();
 
   const refrescar = useCallback(() => {
-    listarArchivarEchasqui()
+    listarArchivarRepositorio()
       .then((r) => setFilas(r.pendientes))
       .catch((e: unknown) => onAviso(String(e)));
   }, [onAviso]);
@@ -59,7 +59,7 @@ export function ArchivarEchasquiPanel({
     const ids = [...sel];
     if (ids.length === 0) return;
     try {
-      const r = await eliminarArchivarEchasqui(ids);
+      const r = await eliminarArchivarRepositorio(ids);
       onAviso(`✓ ${r.eliminadas} pendiente(s) eliminado(s)`);
       setSel(new Set());
       refrescar();
@@ -73,8 +73,8 @@ export function ArchivarEchasquiPanel({
     if (ids.length === 0) return;
     if (!iniciar()) return; // lock global "una tarea a la vez"
     try {
-      await ejecutarArchivarEchasqui(ids);
-      onJobIniciado("archivar_echasqui");
+      await ejecutarArchivarRepositorio(ids);
+      onJobIniciado("archivar_repositorio");
       onCerrar();
     } catch (e) {
       onAviso(String(e));
@@ -95,7 +95,7 @@ export function ArchivarEchasquiPanel({
       >
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-800">
-            Archivar ECHASQUI — pendientes ({filas.length})
+            Archivar REPOSITORIO — pendientes ({filas.length})
           </h2>
           <button onClick={() => onCerrar()} className="text-slate-500">
             ✕
@@ -104,7 +104,7 @@ export function ArchivarEchasquiPanel({
 
         {filas.length === 0 ? (
           <p className="text-sm text-slate-400">
-            No hay echasqui pendientes de archivar.
+            No hay repositorio pendientes de archivar.
           </p>
         ) : (
           <div className="max-h-[55vh] overflow-auto rounded border">

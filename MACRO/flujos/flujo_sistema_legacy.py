@@ -18,7 +18,7 @@ def _agrupar_por_of(filas: list[dict]) -> list[tuple[str, dict]]:
     return sorted(vistos.items())
 
 
-def verificar_pendientes_rsirat(tipo: str, filas) -> dict:
+def verificar_pendientes_sistema_legacy(tipo: str, filas) -> dict:
     """Indica qué órdenes aún no tienen el reporte ``tipo`` descargado.
 
     Respuesta síncrona que consume el diálogo de confirmación:
@@ -56,17 +56,17 @@ def _descargar_lote(filas, tipo, callback_progreso=None):
     return resultado(True, f"{len(oks)} orden(es) procesada(s)", oks=oks)
 
 
-def descargar_ref_tiempos_rsirat(filas, callback_progreso=None):
+def descargar_ref_tiempos_sistema_legacy(filas, callback_progreso=None):
     """Descarga el reporte de referencia y tiempos por orden."""
     return _descargar_lote(filas, "ref_tiempos", callback_progreso)
 
 
-def descargar_antecedentes_rsirat(filas, callback_progreso=None):
+def descargar_antecedentes_sistema_legacy(filas, callback_progreso=None):
     """Descarga los antecedentes por orden."""
     return _descargar_lote(filas, "antecedentes", callback_progreso)
 
 
 __all__ = [
-    "verificar_pendientes_rsirat", "descargar_ref_tiempos_rsirat",
-    "descargar_antecedentes_rsirat",
+    "verificar_pendientes_sistema_legacy", "descargar_ref_tiempos_sistema_legacy",
+    "descargar_antecedentes_sistema_legacy",
 ]

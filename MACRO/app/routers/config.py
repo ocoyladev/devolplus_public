@@ -20,7 +20,7 @@ RUTAS_KEYS = [
     "PATH_RI",
     "PATH_AUTORIZAR",
     "PATH_ARCHIVO",
-    "PATH_SIRAT_EXE",
+    "PATH_LEGACY_EXE",
     "UNIDAD_ORGANICA_FOLIO",
 ]
 
@@ -32,7 +32,7 @@ def _defaults() -> dict[str, str]:
         DEFAULT_PATH_AUTORIZAR,
         DEFAULT_PATH_DESCARGAS,
         DEFAULT_PATH_RI,
-        DEFAULT_PATH_SIRAT_EXE,
+        DEFAULT_PATH_LEGACY_EXE,
     )
 
     return {
@@ -40,7 +40,7 @@ def _defaults() -> dict[str, str]:
         "PATH_RI": DEFAULT_PATH_RI,
         "PATH_AUTORIZAR": DEFAULT_PATH_AUTORIZAR,
         "PATH_ARCHIVO": DEFAULT_PATH_ARCHIVO,
-        "PATH_SIRAT_EXE": DEFAULT_PATH_SIRAT_EXE,
+        "PATH_LEGACY_EXE": DEFAULT_PATH_LEGACY_EXE,
         "UNIDAD_ORGANICA_FOLIO": "7EC400",
     }
 

@@ -177,7 +177,7 @@ def extraer_solicitudes(lineas: list[str], detallado: bool = False) -> list[dict
 
     Con ``detallado=True`` agrega los campos de antecedentes (mto_reconocido,
     num_ri, resultado) usados por el REF.docx. Por defecto NO se agregan, para no
-    contaminar la carga RSIRAT (que usa estas filas como datos del caso).
+    contaminar la carga SISTEMA_LEGACY (que usa estas filas como datos del caso).
     """
     solicitudes = []
     for i, ln in enumerate(lineas):
@@ -199,7 +199,7 @@ def extraer_solicitudes(lineas: list[str], detallado: bool = False) -> list[dict
         # OF
         of_dev = extraer_of_devolucion(tail, lineas, i)
         if not of_dev and not detallado:
-            # Modo carga (RSIRAT): descartamos filas sin OF válido (p. ej. las ya
+            # Modo carga (SISTEMA_LEGACY): descartamos filas sin OF válido (p. ej. las ya
             # resueltas cuyo N° tras 'NO' es un RI 024...). En modo detallado
             # (antecedentes) se conservan, pues son justamente los antecedentes.
             continue

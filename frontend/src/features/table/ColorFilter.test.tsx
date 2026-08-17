@@ -41,7 +41,7 @@ test("sin modelo, todas las filas pasan", () => {
 test("filtra por texto (contiene, sin distinguir mayúsculas)", () => {
   renderFiltro({ texto: "deneg" });
   expect(doesFilterPass?.({ node: nodoCon("DENEGADO") } as IDoesFilterPassParams)).toBe(true);
-  expect(doesFilterPass?.({ node: nodoCon("ITOP") } as IDoesFilterPassParams)).toBe(false);
+  expect(doesFilterPass?.({ node: nodoCon("MESA_AYUDA") } as IDoesFilterPassParams)).toBe(false);
 });
 
 test("combina texto Y color: debe cumplir ambos", () => {
@@ -53,7 +53,7 @@ test("combina texto Y color: debe cumplir ambos", () => {
   // color verde pero no contiene 'auto'
   expect(doesFilterPass?.({ node: nodoCon("DENEGADO") } as IDoesFilterPassParams)).toBe(false);
   // contiene 'auto' pero color naranja
-  expect(doesFilterPass?.({ node: nodoCon("ITOP") } as IDoesFilterPassParams)).toBe(false);
+  expect(doesFilterPass?.({ node: nodoCon("MESA_AYUDA") } as IDoesFilterPassParams)).toBe(false);
 });
 
 test("escribir texto compone el modelo", () => {

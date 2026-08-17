@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 
-import { abrir, descargas, itop } from "../../api/acciones";
+import { abrir, descargas, mesa_ayuda } from "../../api/acciones";
 import { useLanzarTarea, useTareaLock } from "../tareas/tareaLock";
 import { CartasPanel } from "../cartas/CartasPanel";
-import { ConfirmarTicketModal, type ItopDescargaExtra } from "./ConfirmarTicketModal";
+import { ConfirmarTicketModal, type MesaAyudaDescargaExtra } from "./ConfirmarTicketModal";
 import { GenerarDocPanel } from "./GenerarDocPanel";
 
 // Modalidades EXACTAS del backend (una tiene un espacio inicial intencional).
@@ -74,16 +74,16 @@ export function MenuCaso({
     void lanzar(kind, fn, onJobIniciado, onError);
   }
 
-  function echasqui(): void {
+  function repositorio(): void {
     setOpen(false);
-    const exp = window.prompt("N° de expediente(s) E-Chasqui (separe con /):");
+    const exp = window.prompt("N° de expediente(s) E-Doc (separe con /):");
     if (!exp) return;
     const lista = exp
       .split("/")
       .map((s) => s.trim())
       .filter(Boolean);
     if (lista.length > 0) {
-      run("descarga_echasqui", () => descargas.echasqui(row, lista));
+      run("descarga_repositorio", () => descargas.repositorio(row, lista));
     }
   }
 
@@ -125,7 +125,7 @@ export function MenuCaso({
     setTicket(tipo);
   }
 
-  function itopModificar(): void {
+  function mesaAyudaModificar(): void {
     setOpen(false);
     const lista = MODALIDADES.map((m, i) => `${i + 1}) ${m.trim()}`).join("\n");
     const sel = window.prompt(`Modalidad de devolución:\n${lista}\n\nNúmero:`, "1");
@@ -142,7 +142,7 @@ export function MenuCaso({
       if (!c) return;
       cci = c.trim();
     }
-    run("itop_modificar", () => itop.modificar(row, modalidad, cci));
+    run("mesa_ayuda_modificar", () => mesa_ayuda.modificar(row, modalidad, cci));
   }
 
   return (
@@ -207,19 +207,19 @@ export function MenuCaso({
                 <Item onClick={() => run("descarga_exp", () => descargas.expElectronico(row))}>
                   Exp. Electrónico
                 </Item>
-                <Item onClick={echasqui}>E-Chasqui</Item>
+                <Item onClick={repositorio}>E-Doc</Item>
                 <Item onClick={planeamiento}>Planeamiento</Item>
               </Grupo>
             ) : null}
             {!tablaArchivo ? (
-              <Grupo title="iTop">
+              <Grupo title="Mesa de Ayuda">
                 <Item onClick={() => abrirTicket("4ta")}>Rentas 4ta</Item>
                 <Item onClick={() => abrirTicket("5ta")}>Rentas 5ta</Item>
                 <Item onClick={() => abrirTicket("601")}>PDT 601</Item>
                 <Item onClick={() => abrirTicket("601_completo")}>
                   PDT 601 - empleador completo
                 </Item>
-                <Item onClick={itopModificar}>Modificar modalidad</Item>
+                <Item onClick={mesaAyudaModificar}>Modificar modalidad</Item>
               </Grupo>
             ) : null}
           </div>
@@ -247,10 +247,10 @@ export function MenuCaso({
           tipo={ticket}
           row={row}
           onCancelar={() => setTicket(null)}
-          onConfirmado={(extra: ItopDescargaExtra) => {
+          onConfirmado={(extra: MesaAyudaDescargaExtra) => {
             const tipo = ticket;
             setTicket(null);
-            run(`itop_${tipo}`, () => itop.descarga(tipo, row, extra));
+            run(`mesa_ayuda_${tipo}`, () => mesa_ayuda.descarga(tipo, row, extra));
           }}
         />
       ) : null}

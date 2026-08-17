@@ -1,4 +1,4 @@
-"""Esquemas de los tickets iTop (descarga 4ta/5ta/601 y modificar modalidad)."""
+"""Esquemas de los tickets Mesa de Ayuda (descarga 4ta/5ta/601 y modificar modalidad)."""
 from __future__ import annotations
 
 from typing import Any, Literal
@@ -6,7 +6,7 @@ from typing import Any, Literal
 from pydantic import BaseModel
 
 
-class ItopDescargaRequest(BaseModel):
+class MesaAyudaDescargaRequest(BaseModel):
     tipo: Literal["4ta", "5ta", "601", "601_completo"]
     row: dict[str, Any]
     # Solo para 601:
@@ -15,7 +15,7 @@ class ItopDescargaRequest(BaseModel):
     doc_override: str | None = None
 
 
-class ItopPreviewResponse(BaseModel):
+class MesaAyudaPreviewResponse(BaseModel):
     tipo: str
     of: str
     ruc: str
@@ -26,7 +26,7 @@ class ItopPreviewResponse(BaseModel):
     titulo: str
 
 
-class ItopModificarRequest(BaseModel):
+class MesaAyudaModificarRequest(BaseModel):
     row: dict[str, Any]
     modalidad: str
     cci: str | None = None

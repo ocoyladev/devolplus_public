@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { itop } from "../../api/acciones";
+import { mesa_ayuda } from "../../api/acciones";
 
 type Row = Record<string, unknown>;
 type Tipo = "4ta" | "5ta" | "601" | "601_completo";
 
-export interface ItopDescargaExtra {
+export interface MesaAyudaDescargaExtra {
   ruc_empleador?: string;
   nombre_empleador?: string;
   doc_override?: string;
@@ -30,7 +30,7 @@ interface Empleador {
 interface Props {
   tipo: Tipo;
   row: Row;
-  onConfirmado: (extra: ItopDescargaExtra) => void;
+  onConfirmado: (extra: MesaAyudaDescargaExtra) => void;
   onCancelar: () => void;
 }
 
@@ -66,7 +66,7 @@ export function ConfirmarTicketModal({
   useEffect(() => {
     if (!es601(tipo)) return;
     let vivo = true;
-    itop
+    mesa_ayuda
       .empleadores601(row)
       .then((r) => {
         if (!vivo) return;
@@ -87,8 +87,8 @@ export function ConfirmarTicketModal({
     };
   }, [tipo, row]);
 
-  const extra: ItopDescargaExtra = useMemo(() => {
-    const e: ItopDescargaExtra = {};
+  const extra: MesaAyudaDescargaExtra = useMemo(() => {
+    const e: MesaAyudaDescargaExtra = {};
     if (es601(tipo)) {
       e.ruc_empleador = rucEmp.trim();
       e.nombre_empleador = nombreEmp.trim();
@@ -107,7 +107,7 @@ export function ConfirmarTicketModal({
     }
     let vivo = true;
     setError(null);
-    itop
+    mesa_ayuda
       .preview(tipo, row, extra)
       .then((p) => {
         if (vivo) {

@@ -21,7 +21,7 @@ def sync_macros(request: Request) -> JobResponse:
 
 @router.post("/remota", response_model=JobResponse)
 def sync_remota(request: Request) -> JobResponse:
-    """Actualiza la BD local según la BD remota (RSIRAT/Workflow)."""
+    """Actualiza la BD local según la BD remota (SISTEMA_LEGACY/Workflow)."""
     from MACRO.flujos.flujo_sync import actualizar_segun_bd_remota
 
     def tarea(progreso):

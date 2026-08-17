@@ -58,9 +58,9 @@ export function Toolbar({
       <button
         className={BTN}
         disabled={bloqueado}
-        onClick={() => run("pptt", () => procesos.pptt(seleccion))}
+        onClick={() => run("papeles_trabajo", () => procesos.papeles_trabajo(seleccion))}
       >
-        Generar PPTT
+        Generar PAPELES_TRABAJO
       </button>
       <div className="flex items-center gap-1">
         <button
@@ -93,9 +93,9 @@ export function Toolbar({
       <button
         className={BTN}
         disabled={bloqueado}
-        onClick={() => run("archivar_echasqui", () => procesos.archivarEchasqui(seleccion))}
+        onClick={() => run("archivar_repositorio", () => procesos.archivarRepositorio(seleccion))}
       >
-        Archivar ECHASQUI
+        Archivar REPOSITORIO
       </button>
       <AutorizarPanel
         seleccion={seleccion}

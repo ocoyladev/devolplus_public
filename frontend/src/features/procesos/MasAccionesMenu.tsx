@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { descargas, type RsiratPreflight } from "../../api/acciones";
+import { descargas, type SistemaLegacyPreflight } from "../../api/acciones";
 import { useLanzarTarea, useTareaLock } from "../tareas/tareaLock";
 import { ValidarArchivoModal } from "./ValidarArchivoModal";
-import { VerificarEchasquiModal } from "./VerificarEchasquiModal";
+import { VerificarRepositorioModal } from "./VerificarRepositorioModal";
 
 type Fila = Record<string, unknown>;
 
@@ -32,9 +32,9 @@ export function MasAccionesMenu({ filas, archivo = false, onJobIniciado, onError
   const [validarAbierto, setValidarAbierto] = useState(false);
   const [texto, setTexto] = useState<string | null>(null);
   const [copiado, setCopiado] = useState(false);
-  const [confirmarRsirat, setConfirmarRsirat] = useState<null | "ref" | "antec">(null);
+  const [confirmarSistemaLegacy, setConfirmarSistemaLegacy] = useState<null | "ref" | "antec">(null);
   // Verificación previa: null mientras carga; `preflightError` si no se pudo consultar.
-  const [preflight, setPreflight] = useState<RsiratPreflight | null>(null);
+  const [preflight, setPreflight] = useState<SistemaLegacyPreflight | null>(null);
   const [preflightError, setPreflightError] = useState<string | null>(null);
   const { ocupado } = useTareaLock();
   const lanzar = useLanzarTarea();
@@ -76,27 +76,27 @@ export function MasAccionesMenu({ filas, archivo = false, onJobIniciado, onError
     );
   }
 
-  function pedirRsirat(tipo: "ref" | "antec"): void {
+  function pedirSistemaLegacy(tipo: "ref" | "antec"): void {
     setOpen(false);
     setPreflight(null);
     setPreflightError(null);
-    setConfirmarRsirat(tipo);
+    setConfirmarSistemaLegacy(tipo);
     // Verifica en el backend qué PDFs ya existen antes de ofrecer "Iniciar".
     descargas
-      .rsiratPreflight(tipo, filas)
+      .sistemaLegacyPreflight(tipo, filas)
       .then(setPreflight)
       .catch((e: unknown) => setPreflightError(e instanceof Error ? e.message : String(e)));
   }
 
-  function ejecutarRsirat(): void {
-    const tipo = confirmarRsirat;
-    setConfirmarRsirat(null);
+  function ejecutarSistemaLegacy(): void {
+    const tipo = confirmarSistemaLegacy;
+    setConfirmarSistemaLegacy(null);
     if (tipo === "ref") {
-      void lanzar("rsirat_ref", () => descargas.rsiratRef(filas), onJobIniciado, onError);
+      void lanzar("sistema_legacy_ref", () => descargas.sistemaLegacyRef(filas), onJobIniciado, onError);
     } else if (tipo === "antec") {
       void lanzar(
-        "rsirat_antec",
-        () => descargas.rsiratAntecedentes(filas),
+        "sistema_legacy_antec",
+        () => descargas.sistemaLegacyAntecedentes(filas),
         onJobIniciado,
         onError,
       );
@@ -165,7 +165,7 @@ export function MasAccionesMenu({ filas, archivo = false, onJobIniciado, onError
               }}
               className="block w-full px-3 py-1.5 text-left hover:bg-slate-100"
             >
-              Verificar Exp. Echasqui.
+              Verificar Exp. Repositorio.
             </button>
             <button
               onClick={() => {
@@ -178,39 +178,39 @@ export function MasAccionesMenu({ filas, archivo = false, onJobIniciado, onError
             </button>
             <div className="my-1 border-t" />
             <button
-              onClick={() => pedirRsirat("ref")}
+              onClick={() => pedirSistemaLegacy("ref")}
               disabled={sinSeleccion || ocupado}
               className="block w-full px-3 py-1.5 text-left hover:bg-slate-100 disabled:opacity-40"
             >
-              Descargar REF/Tiempos (RSIRAT)
+              Descargar REF/Tiempos (SISTEMA_LEGACY)
             </button>
             <button
-              onClick={() => pedirRsirat("antec")}
+              onClick={() => pedirSistemaLegacy("antec")}
               disabled={sinSeleccion || ocupado}
               className="block w-full px-3 py-1.5 text-left hover:bg-slate-100 disabled:opacity-40"
             >
-              Descargar antecedentes (RSIRAT)
+              Descargar antecedentes (SISTEMA_LEGACY)
             </button>
           </div>
         </>
       ) : null}
 
-      {confirmarRsirat !== null ? (
+      {confirmarSistemaLegacy !== null ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
-          onClick={() => setConfirmarRsirat(null)}
+          onClick={() => setConfirmarSistemaLegacy(null)}
         >
           <div
             className="w-[480px] max-w-[90vw] rounded bg-white p-4 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="mb-2 text-base font-semibold text-slate-800">
-              {confirmarRsirat === "ref"
-                ? "Descargar REF/Tiempos (RSIRAT)"
-                : "Descargar antecedentes (RSIRAT)"}
+              {confirmarSistemaLegacy === "ref"
+                ? "Descargar REF/Tiempos (SISTEMA_LEGACY)"
+                : "Descargar antecedentes (SISTEMA_LEGACY)"}
             </h2>
             <p className="mb-2 text-sm text-slate-600">
-              Se automatizará la aplicación de escritorio SIRAT sobre{" "}
+              Se automatizará la aplicación de escritorio sistema legacy sobre{" "}
               {preflight ? preflight.pendientes : filas.length} caso(s). Durante el
               proceso el mouse y el teclado los controla el script.
             </p>
@@ -269,13 +269,13 @@ export function MasAccionesMenu({ filas, archivo = false, onJobIniciado, onError
 
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setConfirmarRsirat(null)}
+                onClick={() => setConfirmarSistemaLegacy(null)}
                 className="rounded border px-3 py-1 text-sm hover:bg-slate-100"
               >
                 Cancelar
               </button>
               <button
-                onClick={ejecutarRsirat}
+                onClick={ejecutarSistemaLegacy}
                 disabled={preflight !== null && preflight.pendientes === 0}
                 className="rounded bg-blue-600 px-3 py-1 text-sm text-white disabled:opacity-40"
               >
@@ -331,7 +331,7 @@ export function MasAccionesMenu({ filas, archivo = false, onJobIniciado, onError
         </div>
       ) : null}
 
-      <VerificarEchasquiModal
+      <VerificarRepositorioModal
         filas={filas}
         abierto={verificarAbierto}
         onCerrar={() => setVerificarAbierto(false)}

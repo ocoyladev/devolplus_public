@@ -9,21 +9,21 @@ vi.mock("../../api/acciones", () => ({
     numeracion: vi.fn(async () => "job-1"),
     riMasivo: vi.fn(async () => "job-ri"),
     cartasMasivo: vi.fn(async () => "job-ca"),
-    rsiratRef: vi.fn(async () => "job-ref"),
-    rsiratAntecedentes: vi.fn(async () => "job-antec"),
-    rsiratPreflight: vi.fn(),
+    sistemaLegacyRef: vi.fn(async () => "job-ref"),
+    sistemaLegacyAntecedentes: vi.fn(async () => "job-antec"),
+    sistemaLegacyPreflight: vi.fn(),
   },
 }));
 
 const noop = (): void => {};
 
-const FILAS_RSIRAT = [{ of_devolucion: "26001", num_ruc: "10", nombre: "A" }];
+const FILAS_SISTEMA_LEGACY = [{ of_devolucion: "26001", num_ruc: "10", nombre: "A" }];
 
-/** Abre el modal previo de "Descargar REF/Tiempos (RSIRAT)". */
-function abrirModalRef(filas = FILAS_RSIRAT, onJob = noop): void {
+/** Abre el modal previo de "Descargar REF/Tiempos (SISTEMA_LEGACY)". */
+function abrirModalRef(filas = FILAS_SISTEMA_LEGACY, onJob = noop): void {
   render(<MasAccionesMenu filas={filas} onJobIniciado={onJob} onError={noop} />);
   fireEvent.click(screen.getByText("Más acciones ▾"));
-  fireEvent.click(screen.getByText("Descargar REF/Tiempos (RSIRAT)"));
+  fireEvent.click(screen.getByText("Descargar REF/Tiempos (SISTEMA_LEGACY)"));
 }
 
 test("botón deshabilitado sin selección", () => {
@@ -79,8 +79,8 @@ test("Descargar RI (selección) llama a riMasivo con filas + archivo", async () 
   await waitFor(() => expect(onJob).toHaveBeenCalledWith("descarga_ri"));
 });
 
-test("RSIRAT: el modal previo consulta el preflight y deshabilita Iniciar sin pendientes", async () => {
-  vi.mocked(descargas.rsiratPreflight).mockResolvedValue({
+test("SISTEMA_LEGACY: el modal previo consulta el preflight y deshabilita Iniciar sin pendientes", async () => {
+  vi.mocked(descargas.sistemaLegacyPreflight).mockResolvedValue({
     tipo: "ref",
     total: 1,
     pendientes: 0,
@@ -99,7 +99,7 @@ test("RSIRAT: el modal previo consulta el preflight y deshabilita Iniciar sin pe
 
   abrirModalRef();
 
-  expect(descargas.rsiratPreflight).toHaveBeenCalledWith("ref", FILAS_RSIRAT);
+  expect(descargas.sistemaLegacyPreflight).toHaveBeenCalledWith("ref", FILAS_SISTEMA_LEGACY);
   await waitFor(() =>
     expect(screen.getByText(/No hay descargas pendientes/)).toBeInTheDocument(),
   );
@@ -108,8 +108,8 @@ test("RSIRAT: el modal previo consulta el preflight y deshabilita Iniciar sin pe
   expect(screen.getByText(/0 de 1 caso\(s\) con descargas pendientes/)).toBeInTheDocument();
 });
 
-test("RSIRAT: con pendientes se puede iniciar y se anuncia el hotkey de aborto", async () => {
-  vi.mocked(descargas.rsiratPreflight).mockResolvedValue({
+test("SISTEMA_LEGACY: con pendientes se puede iniciar y se anuncia el hotkey de aborto", async () => {
+  vi.mocked(descargas.sistemaLegacyPreflight).mockResolvedValue({
     tipo: "ref",
     total: 1,
     pendientes: 1,
@@ -127,19 +127,19 @@ test("RSIRAT: con pendientes se puede iniciar y se anuncia el hotkey de aborto",
   });
   const onJob = vi.fn();
 
-  abrirModalRef(FILAS_RSIRAT, onJob);
+  abrirModalRef(FILAS_SISTEMA_LEGACY, onJob);
 
   await waitFor(() => expect(screen.getByText("Iniciar")).toBeEnabled());
   expect(screen.getByText(/Ctrl\+Shift\+Q/)).toBeInTheDocument();
   expect(screen.getByText(/pendiente — falta Reporte de Tareas/)).toBeInTheDocument();
 
   fireEvent.click(screen.getByText("Iniciar"));
-  expect(descargas.rsiratRef).toHaveBeenCalledWith(FILAS_RSIRAT);
-  await waitFor(() => expect(onJob).toHaveBeenCalledWith("rsirat_ref"));
+  expect(descargas.sistemaLegacyRef).toHaveBeenCalledWith(FILAS_SISTEMA_LEGACY);
+  await waitFor(() => expect(onJob).toHaveBeenCalledWith("sistema_legacy_ref"));
 });
 
-test("RSIRAT: si el preflight falla se avisa y se permite iniciar igual", async () => {
-  vi.mocked(descargas.rsiratPreflight).mockRejectedValue(new Error("Error 500"));
+test("SISTEMA_LEGACY: si el preflight falla se avisa y se permite iniciar igual", async () => {
+  vi.mocked(descargas.sistemaLegacyPreflight).mockRejectedValue(new Error("Error 500"));
 
   abrirModalRef();
 

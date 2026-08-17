@@ -33,7 +33,7 @@ def cargar_asignacion_excel(callback_progreso=None, ruta=None):
     return resultado(True, f"{insertados} caso(s) cargado(s) desde el catálogo demo")
 
 
-def cargar_rsirat(callback_progreso=None, ruta=None):
+def cargar_sistema_legacy(callback_progreso=None, ruta=None):
     """Carga el reporte del sistema de consulta. En demo equivale a la asignación."""
     return cargar_asignacion_excel(callback_progreso=callback_progreso, ruta=ruta)
 
@@ -89,7 +89,7 @@ def limpiar_cola_descargas(callback_progreso=None):
 
 __all__ = [
     "obtener_dataframe_actual", "obtener_dataframe_archivo",
-    "cargar_asignacion_excel", "cargar_rsirat", "verificar_y_conectar_servicios",
+    "cargar_asignacion_excel", "cargar_sistema_legacy", "verificar_y_conectar_servicios",
     "procesar_descargas_bd", "reintentar_descargas_pendientes",
     "limpiar_cola_descargas",
 ]

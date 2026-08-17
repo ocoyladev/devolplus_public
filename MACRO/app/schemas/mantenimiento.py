@@ -24,7 +24,7 @@ class DescargasColaResponse(BaseModel):
     descargas: list[DescargaColaItem]
 
 
-class ArchivarEchasquiItem(BaseModel):
+class ArchivarRepositorioItem(BaseModel):
     id: int
     num_doc: str | None = None
     ruc: str | None = None
@@ -39,8 +39,8 @@ class ArchivarEchasquiItem(BaseModel):
     fecha_registro: str | None = None
 
 
-class ArchivarEchasquiColaResponse(BaseModel):
-    pendientes: list[ArchivarEchasquiItem]
+class ArchivarRepositorioColaResponse(BaseModel):
+    pendientes: list[ArchivarRepositorioItem]
 
 
 class BorrarCasoRequest(BaseModel):

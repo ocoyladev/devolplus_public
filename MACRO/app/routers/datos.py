@@ -33,10 +33,10 @@ def _serializar(df) -> TablaResponse:
 
 @router.get("/planeamiento-estado")
 def planeamiento_estado() -> dict:
-    """Indica si en este momento se permiten descargas de planeamiento / RSIRAT.
+    """Indica si en este momento se permiten descargas de planeamiento / SISTEMA_LEGACY.
 
     Bloqueado de lunes a viernes de 08:00 a 17:00 (hora de Lima). El frontend usa
-    esto para deshabilitar el botón 'Archivo RSIRAT' dentro de ese horario.
+    esto para deshabilitar el botón 'Archivo SISTEMA_LEGACY' dentro de ese horario.
     """
     from MACRO.funciones.funciones_generales import planeamiento_permitido
 
@@ -76,10 +76,10 @@ def _procesar_archivo(tipo: str, ruta: str, progreso):
         from MACRO.flujos.flujo_asignacion_excel import cargar_asignacion_excel
 
         return cargar_asignacion_excel(callback_progreso=progreso, ruta=ruta)
-    if tipo == "rsirat":
-        from MACRO.flujos.flujo_asignacion_excel import cargar_rsirat
+    if tipo == "sistema_legacy":
+        from MACRO.flujos.flujo_asignacion_excel import cargar_sistema_legacy
 
-        return cargar_rsirat(callback_progreso=progreso, ruta=ruta)
+        return cargar_sistema_legacy(callback_progreso=progreso, ruta=ruta)
     if tipo == "autorizacion":
         from MACRO.flujos.flujo_cargar_datos_gui import cargar_autorizacion_ri
 
@@ -93,7 +93,7 @@ async def cargar_archivo(
     tipo: str = Form(...),
     file: UploadFile = File(...),
 ) -> JobResponse:
-    """Carga datos desde un archivo subido (asignacion | rsirat | autorizacion)."""
+    """Carga datos desde un archivo subido (asignacion | sistema_legacy | autorizacion)."""
     suffix = os.path.splitext(file.filename or "")[1] or ".xlsx"
     contenido = await file.read()
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)

@@ -69,7 +69,7 @@ class JobManager:
                         "ok": False,
                         "error": str(resultado.get("mensaje", "El proceso falló")),
                     }
-                    # Detalle estructurado de casos con error (p. ej. Generar PPTT).
+                    # Detalle estructurado de casos con error (p. ej. Generar PAPELES_TRABAJO).
                     if resultado.get("errores"):
                         evento_fallo["errores"] = list(resultado["errores"])
                     if "ok_count" in resultado:
@@ -101,7 +101,7 @@ class JobManager:
                         resultado.get("archivados"), (list, tuple)
                     ) and resultado["archivados"]:
                         evento["archivados"] = list(resultado["archivados"])
-                    # Detalle estructurado de casos con error y conteo OK (Generar PPTT):
+                    # Detalle estructurado de casos con error y conteo OK (Generar PAPELES_TRABAJO):
                     # el proceso puede terminar con éxito parcial (algunos casos fallan).
                     if isinstance(resultado, dict) and resultado.get("errores"):
                         evento["errores"] = list(resultado["errores"])
@@ -112,7 +112,7 @@ class JobManager:
                             resultado.get(_clave), (list, tuple)
                         ):
                             evento[_clave] = list(resultado[_clave])
-                    # Detalle por echasqui (Archivar ECHASQUI): alimenta el modal de resumen.
+                    # Detalle por repositorio (Archivar REPOSITORIO): alimenta el modal de resumen.
                     if isinstance(resultado, dict) and isinstance(
                         resultado.get("detalle"), (list, tuple)
                     ):

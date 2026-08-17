@@ -8,14 +8,14 @@ export interface EjecucionRun {
   etiqueta: string;
 }
 
-const KINDS_RSIRAT = new Set(["rsirat_ref", "rsirat_antec"]);
+const KINDS_SISTEMA_LEGACY = new Set(["sistema_legacy_ref", "sistema_legacy_antec"]);
 
 /**
  * Ventana de ejecución (overlay bloqueante) mientras corre una función lenta
- * (Autorizar, Generar PPTT o descargas RSIRAT). Muestra el log en vivo y la
+ * (Autorizar, Generar PAPELES_TRABAJO o descargas SISTEMA_LEGACY). Muestra el log en vivo y la
  * barra de progreso. No es descartable: la cierra App al llegar el job_done.
- * La copia del encabezado depende del kind: las descargas RSIRAT advierten que
- * el script controla mouse/teclado; Autorizar/PPTT solo piden esperar.
+ * La copia del encabezado depende del kind: las descargas SISTEMA_LEGACY advierten que
+ * el script controla mouse/teclado; Autorizar/PAPELES_TRABAJO solo piden esperar.
  */
 export function EjecucionOverlay({
   run,
@@ -30,12 +30,12 @@ export function EjecucionOverlay({
 
   if (!run) return null;
 
-  const esRsirat = KINDS_RSIRAT.has(run.kind);
-  const titulo = esRsirat ? "⚠ Automatización en curso" : "⏳ Procesando…";
-  const subtitulo = esRsirat
+  const esSistemaLegacy = KINDS_SISTEMA_LEGACY.has(run.kind);
+  const titulo = esSistemaLegacy ? "⚠ Automatización en curso" : "⏳ Procesando…";
+  const subtitulo = esSistemaLegacy
     ? "NO use el teclado ni el mouse. Para abortar, pulse Ctrl+Shift+Q (o mueva el mouse a una esquina)."
     : "Espere, no cierre la aplicación mientras el proceso termina.";
-  const barraColor = esRsirat ? "bg-amber-500" : "bg-blue-600";
+  const barraColor = esSistemaLegacy ? "bg-amber-500" : "bg-blue-600";
 
   return (
     <div

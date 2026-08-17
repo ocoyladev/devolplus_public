@@ -1,4 +1,4 @@
-"""Derivación de periodos y del documento del trabajador para los tickets iTop.
+"""Derivación de periodos y del documento del trabajador para los tickets Mesa de Ayuda.
 
 Lógica pura, sin dependencias de red ni de la base de datos. Los periodos se
 manejan como enteros en formato ``YYYYMM``.

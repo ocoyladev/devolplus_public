@@ -24,21 +24,21 @@ export interface DecisionC64 {
   valor?: number | null;
 }
 
-export interface EchasquiEstado {
+export interface RepositorioEstado {
   denom: string;
   clasificacion: "OMITIR" | "VIA_ESPECIAL" | "PDF";
   estado: "auto" | "subido" | "pendiente_subir" | "pdf_ok" | "pdf_faltante";
   subible: boolean;
 }
 
-export interface CasoEchasqui {
+export interface CasoRepositorio {
   num_doc: string;
   num_dev: string;
   num_ruc: string;
   nombre: string;
   tipo_exp: "ELECTRONICO" | "FISICO" | "VIRTUAL" | "";
-  echasquis: EchasquiEstado[];
-  sin_echasqui: boolean;
+  repositorios: RepositorioEstado[];
+  sin_repositorio: boolean;
   error: string;
 }
 
@@ -49,7 +49,7 @@ export interface DetalleArchivar {
   mensaje: string;
 }
 
-export interface ItemEchasquiPendiente {
+export interface ItemRepositorioPendiente {
   num_doc: string;
   num_dev: string;
   num_ruc: string;
@@ -61,7 +61,7 @@ export interface AlertaValidacion {
   severidad: "error" | "advertencia";
   mensaje: string;
   accion: string;
-  /** Insumo de la acción cuando no basta el num_doc (p. ej. el denom del echasqui). */
+  /** Insumo de la acción cuando no basta el num_doc (p. ej. el denom del repositorio). */
   item?: string;
 }
 
@@ -70,7 +70,7 @@ export interface PatronIndispensable {
   encontrado: boolean;
 }
 
-export interface EchasquiItem {
+export interface RepositorioItem {
   denom: string;
   clasificacion: string;
   estado: string;
@@ -93,10 +93,10 @@ export interface CasoValidacion {
   origen_tipo12: string;
   is_of_multiple: boolean;
   carpeta_existe: boolean;
-  paso_pptt: boolean;
+  paso_papeles_trabajo: boolean;
   insumo_final: { completo: boolean; faltantes: string[]; puede_foliar: boolean };
-  exp_echasqui: { registrado: boolean; valor: string; autoregistrado: boolean };
-  echasquis: EchasquiItem[];
+  exp_repositorio: { registrado: boolean; valor: string; autoregistrado: boolean };
+  repositorios: RepositorioItem[];
   carga_1649: {
     aplica: boolean;
     local: { reportes: boolean; cedula: boolean };
@@ -121,8 +121,8 @@ export interface AccionSubsanar {
   accion: string;
 }
 
-/** Estado de un caso en la verificación previa de las descargas RSIRAT. */
-export interface RsiratPreflightCaso {
+/** Estado de un caso en la verificación previa de las descargas SISTEMA_LEGACY. */
+export interface SistemaLegacyPreflightCaso {
   of: string;
   ruc: string;
   carpeta: string;
@@ -134,11 +134,11 @@ export interface RsiratPreflightCaso {
   detalle: string;
 }
 
-export interface RsiratPreflight {
+export interface SistemaLegacyPreflight {
   tipo: "ref" | "antec";
   total: number;
   pendientes: number;
-  casos: RsiratPreflightCaso[];
+  casos: SistemaLegacyPreflightCaso[];
 }
 
 interface JobResponse {
@@ -185,7 +185,7 @@ async function postVoid(url: string, body: unknown): Promise<void> {
 export const procesos = {
   archivar: (numDocs: string[]) => postJob("/api/procesos/archivar", { num_docs: numDocs }),
   recuperar: (numDocs: string[]) => postJob("/api/procesos/recuperar", { num_docs: numDocs }),
-  pptt: (numDocs: string[]) => postJob("/api/procesos/pptt", { num_docs: numDocs }),
+  papeles_trabajo: (numDocs: string[]) => postJob("/api/procesos/papeles-trabajo", { num_docs: numDocs }),
   cargaExpedientes: (numDocs: string[], firmaAuto = false) =>
     postJob("/api/procesos/carga-expedientes", {
       num_docs: numDocs,
@@ -210,17 +210,17 @@ export const procesos = {
     }>("/api/procesos/autorizar/pre-check", { lineas });
     return { conflictos, conflictosC64: conflictos_c64 ?? [] };
   },
-  verificarEchasqui: async (numDocs: string[]): Promise<CasoEchasqui[]> => {
-    const { casos } = await postJson<{ casos: CasoEchasqui[] }>(
-      "/api/procesos/verificar-echasqui",
+  verificarRepositorio: async (numDocs: string[]): Promise<CasoRepositorio[]> => {
+    const { casos } = await postJson<{ casos: CasoRepositorio[] }>(
+      "/api/procesos/verificar-repositorio",
       { num_docs: numDocs },
     );
     return casos;
   },
-  subirEchasquiPendientes: (items: ItemEchasquiPendiente[]) =>
-    postJob("/api/procesos/verificar-echasqui/subir", { items }),
-  archivarEchasqui: (numDocs: string[]) =>
-    postJob("/api/procesos/archivar-echasqui", { num_docs: numDocs }),
+  subirRepositorioPendientes: (items: ItemRepositorioPendiente[]) =>
+    postJob("/api/procesos/verificar-repositorio/subir", { items }),
+  archivarRepositorio: (numDocs: string[]) =>
+    postJob("/api/procesos/archivar-repositorio", { num_docs: numDocs }),
   validarArchivo: async (numDocs: string[]): Promise<CasoValidacion[]> => {
     const { casos } = await postJson<{ casos: CasoValidacion[] }>(
       "/api/procesos/validar-archivo",
@@ -243,8 +243,8 @@ export const descargas = {
     postJob("/api/descargas/ri-masivo", { filas, archivo }),
   cartasMasivo: (filas: Row[], archivo = false) =>
     postJob("/api/descargas/cartas-masivo", { filas, archivo }),
-  echasqui: (row: Row, expedientes: string[]) =>
-    postJob("/api/descargas/echasqui", { row, expedientes }),
+  repositorio: (row: Row, expedientes: string[]) =>
+    postJob("/api/descargas/repositorio", { row, expedientes }),
   expElectronico: (row: Row) => postJob("/api/descargas/exp-electronico", { row }),
   tresUit: (row: Row, numFormulario: string | null) =>
     postJob("/api/descargas/3uit", { row, num_formulario: numFormulario }),
@@ -254,12 +254,12 @@ export const descargas = {
     postJob("/api/descargas/planeamiento", { row, ruc }),
   numeracion: (filas: Row[]) => postJob("/api/descargas/numeracion", { filas }),
   reintentar: () => postJob("/api/descargas/reintentar", {}),
-  rsiratRef: (filas: Row[]) => postJob("/api/descargas/rsirat-ref", { filas }),
-  rsiratAntecedentes: (filas: Row[]) =>
-    postJob("/api/descargas/rsirat-antecedentes", { filas }),
+  sistemaLegacyRef: (filas: Row[]) => postJob("/api/descargas/sistema-legacy-ref", { filas }),
+  sistemaLegacyAntecedentes: (filas: Row[]) =>
+    postJob("/api/descargas/sistema-legacy-antecedentes", { filas }),
   /** Qué casos ya tienen sus PDFs y cuáles requieren correr la automatización. */
-  rsiratPreflight: (tipo: "ref" | "antec", filas: Row[]) =>
-    postJson<RsiratPreflight>("/api/descargas/rsirat-preflight", { tipo, filas }),
+  sistemaLegacyPreflight: (tipo: "ref" | "antec", filas: Row[]) =>
+    postJson<SistemaLegacyPreflight>("/api/descargas/sistema-legacy-preflight", { tipo, filas }),
 };
 
 export const abrir = {
@@ -267,7 +267,7 @@ export const abrir = {
   macro: (row: Row, archivo = false) => postVoid("/api/abrir/macro", { row, archivo }),
 };
 
-export const itop = {
+export const mesa_ayuda = {
   descarga: (
     tipo: "4ta" | "5ta" | "601" | "601_completo",
     row: Row,
@@ -276,7 +276,7 @@ export const itop = {
       nombre_empleador?: string;
       doc_override?: string;
     },
-  ) => postJob("/api/itop/descarga", { tipo, row, ...extra }),
+  ) => postJob("/api/mesa-ayuda/descarga", { tipo, row, ...extra }),
   preview: (
     tipo: "4ta" | "5ta" | "601" | "601_completo",
     row: Row,
@@ -291,12 +291,12 @@ export const itop = {
       periodo_fin: number;
       contenido_txt: string;
       titulo: string;
-    }>("/api/itop/preview", { tipo, row, ...extra }),
+    }>("/api/mesa-ayuda/preview", { tipo, row, ...extra }),
   modificar: (row: Row, modalidad: string, cci: string | null) =>
-    postJob("/api/itop/modificar", { row, modalidad, cci }),
+    postJob("/api/mesa-ayuda/modificar", { row, modalidad, cci }),
   empleadores601: (row: Row) =>
     postJson<{ empleadores: { ruc: string; nombre: string }[] }>(
-      "/api/itop/empleadores-601",
+      "/api/mesa-ayuda/empleadores-601",
       { row },
     ),
 };

@@ -1,8 +1,8 @@
-"""Definición de los tipos de ticket iTop y armado de sus textos/archivos.
+"""Definición de los tipos de ticket Mesa de Ayuda y armado de sus textos/archivos.
 
 Cada tipo (4ta / 5ta / 601 / 601_completo) tiene constantes propias (``TicketSpec``) y plantillas
 de título, descripción y contenido del ``.txt``. La lógica de periodos y del
-documento del trabajador vive en :mod:`MACRO.itop.periodos`.
+documento del trabajador vive en :mod:`MACRO.mesa_ayuda.periodos`.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
-from MACRO.itop import periodos
+from MACRO.mesa_ayuda import periodos
 
 
 @dataclass
@@ -31,7 +31,7 @@ class DatosTicket:
 
 @dataclass(frozen=True)
 class TicketSpec:
-    """Constantes del formulario iTop para un tipo de ticket.
+    """Constantes del formulario Mesa de Ayuda para un tipo de ticket.
 
     ``con_adjunto`` distingue los tipos que suben un ``.txt`` (descargas) de los
     que llenan campos de plantilla (p. ej. modificar forma de devolución).
@@ -67,7 +67,7 @@ class DatosModificar:
     tipo: str = "modificar"
 
 
-# Opciones del dropdown A01 tal como las espera iTop (la 2ª lleva un espacio
+# Opciones del dropdown A01 tal como las espera Mesa de Ayuda (la 2ª lleva un espacio
 # inicial; debe enviarse exactamente así).
 MODALIDADES: tuple[str, ...] = (
     "De Abono en Cuenta a Cheque",

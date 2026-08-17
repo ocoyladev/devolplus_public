@@ -60,7 +60,7 @@ export const borrarCaso = (numDoc: string, borrarCarpeta: boolean) =>
     body: JSON.stringify({ num_doc: numDoc, borrar_carpeta: borrarCarpeta }),
   });
 
-export interface PendienteArchivoEchasqui {
+export interface PendienteArchivoRepositorio {
   id: number;
   num_doc: string | null;
   ruc: string | null;
@@ -75,19 +75,19 @@ export interface PendienteArchivoEchasqui {
   fecha_registro: string | null;
 }
 
-export const listarArchivarEchasqui = () =>
-  pedir<{ pendientes: PendienteArchivoEchasqui[] }>(
-    "/api/mantenimiento/archivar-echasqui",
+export const listarArchivarRepositorio = () =>
+  pedir<{ pendientes: PendienteArchivoRepositorio[] }>(
+    "/api/mantenimiento/archivar-repositorio",
   );
 
-export const eliminarArchivarEchasqui = (ids: number[]) =>
+export const eliminarArchivarRepositorio = (ids: number[]) =>
   pedir<{ eliminadas: number }>(
-    "/api/mantenimiento/archivar-echasqui/eliminar",
+    "/api/mantenimiento/archivar-repositorio/eliminar",
     postIds(ids),
   );
 
-export const ejecutarArchivarEchasqui = (ids: number[]) =>
+export const ejecutarArchivarRepositorio = (ids: number[]) =>
   pedir<{ job_id: string }>(
-    "/api/mantenimiento/archivar-echasqui/ejecutar",
+    "/api/mantenimiento/archivar-repositorio/ejecutar",
     postIds(ids),
   );

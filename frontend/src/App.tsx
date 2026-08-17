@@ -14,9 +14,9 @@ import { CasosTable } from "./features/table/CasosTable";
 import type { ModoColumnas } from "./features/table/columnas";
 import { MenuCaso } from "./features/procesos/MenuCaso";
 import { Toolbar } from "./features/procesos/Toolbar";
-import { ResultadoModal, type ResultadoPptt } from "./features/procesos/ResultadoModal";
+import { ResultadoModal, type ResultadoPapelesTrabajo } from "./features/procesos/ResultadoModal";
 import { EjecucionOverlay, type EjecucionRun } from "./features/procesos/EjecucionOverlay";
-import { ResumenArchivarEchasqui } from "./features/archivo-echasqui/ResumenArchivarEchasqui";
+import { ResumenArchivarRepositorio } from "./features/archivo-repositorio/ResumenArchivarRepositorio";
 import type { DetalleArchivar } from "./api/acciones";
 import { SyncMenu } from "./features/sync/SyncMenu";
 import { verificarServicios, type ServiciosEstado } from "./api/servicios";
@@ -32,7 +32,7 @@ function dotColor(estado?: boolean | null): string {
   return estado ? "text-green-600" : "text-red-500";
 }
 
-const KINDS_OVERLAY = new Set(["autorizar", "pptt", "rsirat_ref", "rsirat_antec"]);
+const KINDS_OVERLAY = new Set(["autorizar", "papeles_trabajo", "sistema_legacy_ref", "sistema_legacy_antec"]);
 
 export default function App(): JSX.Element {
   const version = useAppVersion();
@@ -48,7 +48,7 @@ export default function App(): JSX.Element {
   const [verificando, setVerificando] = useState(false);
   const [acceso, setAcceso] = useState<AccesoEstado | null>(null);
   const [configInicial] = useState(false);
-  const [resultadoPptt, setResultadoPptt] = useState<ResultadoPptt | null>(null);
+  const [resultadoPapelesTrabajo, setResultadoPapelesTrabajo] = useState<ResultadoPapelesTrabajo | null>(null);
   const [ejecucionRun, setEjecucionRun] = useState<EjecucionRun | null>(null);
   const [resumenArchivar, setResumenArchivar] = useState<DetalleArchivar[] | null>(null);
   const [progreso, setProgreso] = useState<{ done: number; total: number; etiqueta: string } | null>(null);
@@ -158,36 +158,36 @@ export default function App(): JSX.Element {
       const kind = String(e.kind ?? "");
       if (KINDS_OVERLAY.has(kind)) {
         setEjecucionRun(null);
-        const esRef = kind === "rsirat_ref";
-        const esAntec = kind === "rsirat_antec";
-        setResultadoPptt({
+        const esRef = kind === "sistema_legacy_ref";
+        const esAntec = kind === "sistema_legacy_antec";
+        setResultadoPapelesTrabajo({
           ok: Boolean(e.ok),
           mensaje: e.ok ? e.mensaje ?? "Proceso completado." : e.error ?? "El proceso falló.",
           okCount: e.ok_count,
           oks: e.oks ?? [],
           errores: e.errores ?? [],
           tituloExito: esRef
-            ? "REF/Tiempos (RSIRAT) — completado"
+            ? "REF/Tiempos (SISTEMA_LEGACY) — completado"
             : esAntec
-              ? "Antecedentes (RSIRAT) — completado"
+              ? "Antecedentes (SISTEMA_LEGACY) — completado"
               : kind === "autorizar"
                 ? "Autorizar — completado"
-                : "Generar PPTT — completado",
+                : "Generar PAPELES_TRABAJO — completado",
           tituloError: esRef
-            ? "REF/Tiempos (RSIRAT) — finalizó con errores"
+            ? "REF/Tiempos (SISTEMA_LEGACY) — finalizó con errores"
             : esAntec
-              ? "Antecedentes (RSIRAT) — finalizó con errores"
+              ? "Antecedentes (SISTEMA_LEGACY) — finalizó con errores"
               : kind === "autorizar"
                 ? "Autorizar — finalizó con errores"
-                : "Generar PPTT — finalizó con errores",
+                : "Generar PAPELES_TRABAJO — finalizó con errores",
         });
-        // Autorizar y PPTT modifican la tabla; RSIRAT no.
-        if (kind === "autorizar" || kind === "pptt") recargar();
+        // Autorizar y PAPELES_TRABAJO modifican la tabla; SISTEMA_LEGACY no.
+        if (kind === "autorizar" || kind === "papeles_trabajo") recargar();
         return;
       }
       // Descarga masiva de cartas: modal con oks / ya descargadas / omitidas.
       if (kind === "descarga_cartas_masivo") {
-        setResultadoPptt({
+        setResultadoPapelesTrabajo({
           ok: Boolean(e.ok),
           mensaje: e.ok ? e.mensaje ?? "Descarga completada." : e.error ?? "La descarga falló.",
           okCount: e.ok_count,
@@ -200,17 +200,17 @@ export default function App(): JSX.Element {
         });
         return;
       }
-      // Archivar ECHASQUI: modal de resumen (desde la barra o la cola de mantenimiento).
-      if (String(e.kind ?? "") === "archivar_echasqui") {
+      // Archivar REPOSITORIO: modal de resumen (desde la barra o la cola de mantenimiento).
+      if (String(e.kind ?? "") === "archivar_repositorio") {
         setResumenArchivar(e.detalle ?? []);
         recargar();
         return;
       }
       if (e.ok) {
         mostrarAviso(e.mensaje ? `✓ ${e.mensaje}` : "✓ Proceso finalizado");
-        // Descargas y tickets iTop no modifican la tabla: no recargar.
+        // Descargas y tickets Mesa de Ayuda no modifican la tabla: no recargar.
         const k = String(e.kind ?? "");
-        if (!k.startsWith("itop") && !k.startsWith("descarga")) recargar();
+        if (!k.startsWith("mesa_ayuda") && !k.startsWith("descarga")) recargar();
         // Casos preexistentes en archivo: ofrecer desarchivarlos.
         if (e.archivados && e.archivados.length > 0) {
           const ok = window.confirm(
@@ -298,7 +298,7 @@ export default function App(): JSX.Element {
             onError={mostrarAviso}
           />
           <div className="flex items-center gap-2 border-l pl-3 text-xs text-slate-600">
-            <span title="Estado de login en Portal / E-Chasqui">
+            <span title="Estado de login en Portal / E-Doc">
               Portal/E-Doc{" "}
               <span className={dotColor(servicios?.portal)}>●</span>
             </span>
@@ -378,11 +378,11 @@ export default function App(): JSX.Element {
       <EjecucionOverlay run={ejecucionRun} />
 
       <ResultadoModal
-        resultado={resultadoPptt}
-        onClose={() => setResultadoPptt(null)}
+        resultado={resultadoPapelesTrabajo}
+        onClose={() => setResultadoPapelesTrabajo(null)}
       />
 
-      <ResumenArchivarEchasqui
+      <ResumenArchivarRepositorio
         detalle={resumenArchivar}
         onClose={() => setResumenArchivar(null)}
       />

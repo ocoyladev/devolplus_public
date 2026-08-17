@@ -12,12 +12,12 @@ from MACRO.app.schemas.procesos import (
     PreCheckRequest,
     PreCheckResponse,
     ProcesoDocsRequest,
-    SubirEchasquiRequest,
+    SubirRepositorioRequest,
     SubsanarRequest,
     ValidarArchivoRequest,
     ValidarArchivoResponse,
-    VerificarEchasquiRequest,
-    VerificarEchasquiResponse,
+    VerificarRepositorioRequest,
+    VerificarRepositorioResponse,
 )
 
 router = APIRouter(prefix="/api/procesos", tags=["procesos"])
@@ -45,26 +45,26 @@ def recuperar(body: ProcesoDocsRequest, request: Request) -> JobResponse:
     return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="recuperar"))
 
 
-@router.post("/pptt", response_model=JobResponse)
-def generar_pptt(body: ProcesoDocsRequest, request: Request) -> JobResponse:
-    """Genera el PPTT (REF/RI/MACRO consolidado) para los casos indicados.
+@router.post("/papeles-trabajo", response_model=JobResponse)
+def generar_papeles_trabajo(body: ProcesoDocsRequest, request: Request) -> JobResponse:
+    """Genera el PAPELES_TRABAJO (REF/RI/MACRO consolidado) para los casos indicados.
 
-    Nota: los prompts interactivos de contraseña de PDF (ECHASQUI) y de
+    Nota: los prompts interactivos de contraseña de PDF (REPOSITORIO) y de
     desempate OF_MULTIPLE se pasan como ``None`` (degradación elegante:
     intenta la clave derivada del RUC y omite los PDFs protegidos). El prompt
     interactivo por WebSocket queda como mejora futura.
     """
-    from MACRO.flujos.flujo_generar_pptt import procesar_generar_pptt
+    from MACRO.flujos.flujo_generar_papeles_trabajo import procesar_generar_papeles_trabajo
 
     def tarea(progreso):
-        return procesar_generar_pptt(
+        return procesar_generar_papeles_trabajo(
             body.num_docs,
             callback_progreso=progreso,
             solicitar_password=None,
             solicitar_eleccion=None,
         )
 
-    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="pptt"))
+    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="papeles_trabajo"))
 
 
 @router.post("/carga-expedientes", response_model=JobResponse)
@@ -103,54 +103,54 @@ def autorizar_pre_check(body: PreCheckRequest) -> PreCheckResponse:
     return PreCheckResponse(conflictos=res["c65"], conflictos_c64=res["c64"])
 
 
-@router.post("/verificar-echasqui", response_model=VerificarEchasquiResponse)
-def verificar_echasqui(body: VerificarEchasquiRequest) -> VerificarEchasquiResponse:
-    """Verifica qué echasqui electrónicos figuran en el expediente y cuáles no."""
-    from MACRO.flujos.flujo_verificar_echasqui import verificar_exp_echasqui
+@router.post("/verificar-repositorio", response_model=VerificarRepositorioResponse)
+def verificar_repositorio(body: VerificarRepositorioRequest) -> VerificarRepositorioResponse:
+    """Verifica qué repositorio electrónicos figuran en el expediente y cuáles no."""
+    from MACRO.flujos.flujo_verificar_repositorio import verificar_exp_repositorio
 
-    res = verificar_exp_echasqui(body.num_docs)
-    return VerificarEchasquiResponse(casos=res["casos"])
+    res = verificar_exp_repositorio(body.num_docs)
+    return VerificarRepositorioResponse(casos=res["casos"])
 
 
-@router.post("/archivar-echasqui", response_model=JobResponse)
-def archivar_echasqui(body: ProcesoDocsRequest, request: Request) -> JobResponse:
-    """Encola y ejecuta el archivado (ATENDIDO) de los echasqui de los casos."""
-    from MACRO.flujos.flujo_archivar_echasqui import (
-        encolar_archivar_echasqui, ejecutar_archivar_echasqui,
+@router.post("/archivar-repositorio", response_model=JobResponse)
+def archivar_repositorio(body: ProcesoDocsRequest, request: Request) -> JobResponse:
+    """Encola y ejecuta el archivado (ATENDIDO) de los repositorio de los casos."""
+    from MACRO.flujos.flujo_archivar_repositorio import (
+        encolar_archivar_repositorio, ejecutar_archivar_repositorio,
     )
     num_docs = list(body.num_docs)
 
     def tarea(progreso):
-        enc = encolar_archivar_echasqui(num_docs)
-        res = ejecutar_archivar_echasqui(enc["ids"], progreso)
+        enc = encolar_archivar_repositorio(num_docs)
+        res = ejecutar_archivar_repositorio(enc["ids"], progreso)
         extra = ""
         if enc["omitidos"]:
             extra += f", {len(enc['omitidos'])} omitido(s) por datos faltantes"
         if enc.get("sin_exp"):
-            extra += f", {len(enc['sin_exp'])} sin echasqui válido en la columna"
+            extra += f", {len(enc['sin_exp'])} sin repositorio válido en la columna"
         res["mensaje"] = res.get("mensaje", "") + extra
         res["exito"] = True  # el resumen (detalle) se muestra siempre en el modal
         return res
 
-    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="archivar_echasqui"))
+    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="archivar_repositorio"))
 
 
-@router.post("/verificar-echasqui/subir", response_model=JobResponse)
-def subir_echasqui(body: SubirEchasquiRequest, request: Request) -> JobResponse:
-    """Sube por vía especial los echasqui electrónicos pendientes indicados (job)."""
-    from MACRO.flujos.flujo_verificar_echasqui import subir_echasqui_pendientes
+@router.post("/verificar-repositorio/subir", response_model=JobResponse)
+def subir_repositorio(body: SubirRepositorioRequest, request: Request) -> JobResponse:
+    """Sube por vía especial los repositorio electrónicos pendientes indicados (job)."""
+    from MACRO.flujos.flujo_verificar_repositorio import subir_repositorio_pendientes
 
     items = [it.model_dump() for it in body.items]
 
     def tarea(progreso):
-        return subir_echasqui_pendientes(items, progreso)
+        return subir_repositorio_pendientes(items, progreso)
 
-    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="subir_echasqui"))
+    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="subir_repositorio"))
 
 
 @router.post("/validar-archivo", response_model=ValidarArchivoResponse)
 def validar_archivo(body: ValidarArchivoRequest, request: Request) -> ValidarArchivoResponse:
-    """Valida (síncrono) cada caso/OF: PPTT, insumo final, Exp. ECHASQUI, carga
+    """Valida (síncrono) cada caso/OF: PAPELES_TRABAJO, insumo final, Exp. REPOSITORIO, carga
     1649 y elementos indispensables. Incluye casos archivados.
 
     El resultado es la propia respuesta, así que no es un job; aun así emite

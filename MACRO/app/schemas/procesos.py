@@ -55,41 +55,41 @@ class PreCheckResponse(BaseModel):
     conflictos_c64: list[ConflictoC64] = []
 
 
-class VerificarEchasquiRequest(BaseModel):
+class VerificarRepositorioRequest(BaseModel):
     num_docs: list[str]
 
 
-class EchasquiEstado(BaseModel):
+class RepositorioEstado(BaseModel):
     denom: str
     clasificacion: str
     estado: str
     subible: bool = False
 
 
-class CasoEchasqui(BaseModel):
+class CasoRepositorio(BaseModel):
     num_doc: str
     num_dev: str
     num_ruc: str
     nombre: str
     tipo_exp: str = ""
-    echasquis: list[EchasquiEstado] = []
-    sin_echasqui: bool = False
+    repositorios: list[RepositorioEstado] = []
+    sin_repositorio: bool = False
     error: str = ""
 
 
-class VerificarEchasquiResponse(BaseModel):
-    casos: list[CasoEchasqui]
+class VerificarRepositorioResponse(BaseModel):
+    casos: list[CasoRepositorio]
 
 
-class ItemEchasquiPendiente(BaseModel):
+class ItemRepositorioPendiente(BaseModel):
     num_doc: str
     num_dev: str
     num_ruc: str
     denom: str
 
 
-class SubirEchasquiRequest(BaseModel):
-    items: list[ItemEchasquiPendiente]
+class SubirRepositorioRequest(BaseModel):
+    items: list[ItemRepositorioPendiente]
 
 
 class AlertaValidacion(BaseModel):
@@ -98,7 +98,7 @@ class AlertaValidacion(BaseModel):
     mensaje: str
     accion: str = ""
     # Insumo de la acción cuando no basta el num_doc (p. ej. la denominación del
-    # echasqui a subir por vía especial).
+    # repositorio a subir por vía especial).
     item: str = ""
 
 
@@ -108,13 +108,13 @@ class InsumoFinal(BaseModel):
     puede_foliar: bool = False
 
 
-class ExpEchasquiEstado(BaseModel):
+class ExpRepositorioEstado(BaseModel):
     registrado: bool
     valor: str = ""
     autoregistrado: bool = False
 
 
-class EchasquiItem(BaseModel):
+class RepositorioItem(BaseModel):
     denom: str
     clasificacion: str = ""
     estado: str = ""
@@ -161,10 +161,10 @@ class CasoValidacion(BaseModel):
     origen_tipo12: str = ""
     is_of_multiple: bool = False
     carpeta_existe: bool = False
-    paso_pptt: bool = False
+    paso_papeles_trabajo: bool = False
     insumo_final: InsumoFinal
-    exp_echasqui: ExpEchasquiEstado
-    echasquis: list[EchasquiItem] = []
+    exp_repositorio: ExpRepositorioEstado
+    repositorios: list[RepositorioItem] = []
     carga_1649: Carga1649
     indispensables: Indispensables
     alertas: list[AlertaValidacion] = []

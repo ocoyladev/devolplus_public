@@ -22,14 +22,14 @@ const RUTA_LABELS: Record<keyof RutasConfig, string> = {
   PATH_RI: "RI",
   PATH_AUTORIZAR: "Autorizar",
   PATH_ARCHIVO: "Archivo",
-  PATH_SIRAT_EXE: "Ejecutable SIRAT (.exe)",
+  PATH_LEGACY_EXE: "Ejecutable sistema legacy (.exe)",
   UNIDAD_ORGANICA_FOLIO: "Unidad orgánica (folio)",
 };
 
 // Sistemas de credenciales reales del aplicativo.
 const SISTEMAS: { id: string; label: string }[] = [
   { id: "Portal", label: "Portal" },
-  { id: "Workflow", label: "Workflow / iTop" },
+  { id: "Workflow", label: "Workflow / Mesa de Ayuda" },
 ];
 
 const INPUT = "mt-0.5 w-full rounded border p-1.5 text-sm";
@@ -162,7 +162,7 @@ export function ConfigPanel({ onAviso, abrirInicial }: Props): JSX.Element {
                         onChange={(e) => setRutas({ ...rutas, [k]: e.target.value })}
                         className="w-full rounded border p-1.5 font-mono text-sm"
                       />
-                      {k.startsWith("PATH_") && k !== "PATH_SIRAT_EXE" ? (
+                      {k.startsWith("PATH_") && k !== "PATH_LEGACY_EXE" ? (
                         <button
                           type="button"
                           onClick={() => void elegirCarpeta(k)}

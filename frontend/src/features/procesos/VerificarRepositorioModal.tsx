@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import {
   procesos,
-  type CasoEchasqui,
-  type EchasquiEstado,
-  type ItemEchasquiPendiente,
+  type CasoRepositorio,
+  type RepositorioEstado,
+  type ItemRepositorioPendiente,
 } from "../../api/acciones";
 import { useTareaLock } from "../tareas/tareaLock";
 
@@ -23,12 +23,12 @@ function claveP(numDoc: string, denom: string): string {
   return `${numDoc}::${denom}`;
 }
 
-function esPendiente(e: EchasquiEstado): boolean {
+function esPendiente(e: RepositorioEstado): boolean {
   return e.estado === "pendiente_subir" || e.estado === "pdf_faltante";
 }
 
-/** Etiqueta corta para un echasqui ya resuelto (o automático). */
-function etiquetaEstado(e: EchasquiEstado): string {
+/** Etiqueta corta para un repositorio ya resuelto (o automático). */
+function etiquetaEstado(e: RepositorioEstado): string {
   switch (e.estado) {
     case "subido":
       return "✓ subido —";
@@ -43,7 +43,7 @@ function etiquetaEstado(e: EchasquiEstado): string {
   }
 }
 
-export function VerificarEchasquiModal({
+export function VerificarRepositorioModal({
   filas,
   abierto,
   onCerrar,
@@ -51,7 +51,7 @@ export function VerificarEchasquiModal({
   onError,
 }: Props): JSX.Element | null {
   const [cargando, setCargando] = useState(false);
-  const [casos, setCasos] = useState<CasoEchasqui[]>([]);
+  const [casos, setCasos] = useState<CasoRepositorio[]>([]);
   const [seleccion, setSeleccion] = useState<Record<string, boolean>>({});
   const { ocupado, iniciar, terminar } = useTareaLock();
 
@@ -65,12 +65,12 @@ export function VerificarEchasquiModal({
     }
     setCargando(true);
     try {
-      const res = await procesos.verificarEchasqui(numDocs);
+      const res = await procesos.verificarRepositorio(numDocs);
       setCasos(res);
-      // Por defecto, todos los echasqui subibles marcados.
+      // Por defecto, todos los repositorio subibles marcados.
       const sel: Record<string, boolean> = {};
       for (const c of res)
-        for (const e of c.echasquis)
+        for (const e of c.repositorios)
           if (e.subible) sel[claveP(c.num_doc, e.denom)] = true;
       setSeleccion(sel);
     } catch (e) {
@@ -88,8 +88,8 @@ export function VerificarEchasquiModal({
     }
   }, [abierto, verificar]);
 
-  const itemsSeleccionados: ItemEchasquiPendiente[] = casos.flatMap((c) =>
-    c.echasquis
+  const itemsSeleccionados: ItemRepositorioPendiente[] = casos.flatMap((c) =>
+    c.repositorios
       .filter((e) => e.subible && seleccion[claveP(c.num_doc, e.denom)])
       .map((e) => ({
         num_doc: c.num_doc,
@@ -103,8 +103,8 @@ export function VerificarEchasquiModal({
     if (itemsSeleccionados.length === 0) return;
     if (!iniciar()) return; // ya hay una tarea en curso
     try {
-      await procesos.subirEchasquiPendientes(itemsSeleccionados);
-      onJobIniciado("subir_echasqui");
+      await procesos.subirRepositorioPendientes(itemsSeleccionados);
+      onJobIniciado("subir_repositorio");
       // job en curso: el lock se libera al llegar job_done
     } catch (e) {
       onError(String(e));
@@ -115,7 +115,7 @@ export function VerificarEchasquiModal({
   if (!abierto) return null;
 
   const totalPendientes = casos.reduce(
-    (n, c) => n + c.echasquis.filter(esPendiente).length,
+    (n, c) => n + c.repositorios.filter(esPendiente).length,
     0,
   );
 
@@ -130,7 +130,7 @@ export function VerificarEchasquiModal({
       >
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-800">
-            Verificar Exp. Echasqui.
+            Verificar Exp. Repositorio.
           </h2>
           <button onClick={() => onCerrar()} className="text-slate-500">
             ✕
@@ -156,12 +156,12 @@ export function VerificarEchasquiModal({
                   </div>
                   {c.error ? (
                     <div className="text-xs text-red-600">⚠ {c.error}</div>
-                  ) : c.sin_echasqui ? (
+                  ) : c.sin_repositorio ? (
                     <div className="text-xs text-slate-500">
-                      Sin echasqui identificados.
+                      Sin repositorio identificados.
                     </div>
                   ) : (
-                    c.echasquis.map((e) =>
+                    c.repositorios.map((e) =>
                       e.subible ? (
                         <label
                           key={e.denom}

@@ -10,13 +10,13 @@ interface Props {
 
 // Tipos de carga que dependen de las descargas de planeamiento (deshabilitados
 // en horario laboral: L–V 08:00–17:00 hora de Lima).
-const TIPOS_PLANEAMIENTO = new Set(["rsirat"]);
+const TIPOS_PLANEAMIENTO = new Set(["sistema_legacy"]);
 
 export function CargarPanel({ onJobIniciado, onError }: Props): JSX.Element {
   const [abierto, setAbierto] = useState(false);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
-  // Si es false, el 'Archivo RSIRAT' está deshabilitado por horario.
+  // Si es false, el 'Archivo SISTEMA_LEGACY' está deshabilitado por horario.
   const [planeamientoOk, setPlaneamientoOk] = useState(true);
   const { ocupado, iniciar, terminar } = useTareaLock();
 
@@ -119,7 +119,7 @@ export function CargarPanel({ onJobIniciado, onError }: Props): JSX.Element {
               <div className="flex flex-wrap gap-2">
                 {[
                   { tipo: "asignacion", label: "Archivo de asignación" },
-                  { tipo: "rsirat", label: "Archivo RSIRAT" },
+                  { tipo: "sistema_legacy", label: "Archivo SISTEMA_LEGACY" },
                   { tipo: "autorizacion", label: "Archivo de autorización (RI)" },
                 ].map(({ tipo, label }) => {
                   const bloqueado = TIPOS_PLANEAMIENTO.has(tipo) && !planeamientoOk;

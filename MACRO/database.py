@@ -35,7 +35,7 @@ DB_FILE = get_db_path()
 # tabla_asign y su versión _archivo. Añadir aquí futuras columnas nuevas.
 COLUMNAS_EXTRA = {
     "adeudos_aplicar": "TEXT DEFAULT '0.00'",
-    "exp_echasqui": "TEXT DEFAULT ''",
+    "exp_repositorio": "TEXT DEFAULT ''",
 }
 
 
@@ -119,7 +119,7 @@ def init_db():
             int_importe TEXT,
             int_valor TEXT,
             adeudos_aplicar TEXT,
-            exp_echasqui TEXT,
+            exp_repositorio TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -215,9 +215,9 @@ def init_db():
         )
     ''')
 
-    # Cola de archivado de expedientes ECHASQUI (conclusión ATENDIDO).
+    # Cola de archivado de expedientes REPOSITORIO (conclusión ATENDIDO).
     c.execute('''
-        CREATE TABLE IF NOT EXISTS tabla_archivar_echasqui (
+        CREATE TABLE IF NOT EXISTS tabla_archivar_repositorio (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             num_doc TEXT, ruc TEXT, num_ri TEXT,
             aduana TEXT, urd TEXT, anio TEXT, nroexpedi TEXT, denom TEXT,
@@ -577,7 +577,7 @@ def obtener_tabla_asign():
 def obtener_tabla_asign_incluye_archivo():
     """Como ``obtener_tabla_asign`` pero une ``tabla_asign_archivo`` (casos
     archivados). Ante ``num_doc`` duplicado, gana la fila activa. Usado por
-    'Generar PPTT' para operar también sobre casos archivados."""
+    'Generar PAPELES_TRABAJO' para operar también sobre casos archivados."""
     df = obtener_tabla_asign()
     if df is None:
         df = pd.DataFrame()
@@ -1045,13 +1045,13 @@ def contar_descargas_pendientes_bd():
     return count
 
 
-# --- Cola de archivado ECHASQUI -------------------------------------------
+# --- Cola de archivado REPOSITORIO -------------------------------------------
 
-def crear_tabla_archivar_echasqui():
-    """Crea la cola de archivado echasqui si no existe (idempotente)."""
+def crear_tabla_archivar_repositorio():
+    """Crea la cola de archivado repositorio si no existe (idempotente)."""
     conn = get_db_connection()
     conn.execute('''
-        CREATE TABLE IF NOT EXISTS tabla_archivar_echasqui (
+        CREATE TABLE IF NOT EXISTS tabla_archivar_repositorio (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             num_doc TEXT, ruc TEXT, num_ri TEXT,
             aduana TEXT, urd TEXT, anio TEXT, nroexpedi TEXT, denom TEXT,
@@ -1064,14 +1064,14 @@ def crear_tabla_archivar_echasqui():
     conn.close()
 
 
-def upsert_archivar_echasqui(item):
+def upsert_archivar_repositorio(item):
     """Inserta un pendiente; si ya existe la clave (num_doc,aduana,urd,anio,
     nroexpedi) lo reactiva a 'pendiente'. Devuelve el id de la fila."""
-    crear_tabla_archivar_echasqui()
+    crear_tabla_archivar_repositorio()
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('''
-        INSERT INTO tabla_archivar_echasqui
+        INSERT INTO tabla_archivar_repositorio
             (num_doc, ruc, num_ri, aduana, urd, anio, nroexpedi, denom, estado, mensaje)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', '')
         ON CONFLICT(num_doc, aduana, urd, anio, nroexpedi) DO UPDATE SET
@@ -1081,7 +1081,7 @@ def upsert_archivar_echasqui(item):
           item.get("aduana"), item.get("urd"), item.get("anio"),
           item.get("nroexpedi"), item.get("denom")))
     conn.commit()
-    c.execute('''SELECT id FROM tabla_archivar_echasqui
+    c.execute('''SELECT id FROM tabla_archivar_repositorio
                  WHERE num_doc=? AND aduana=? AND urd=? AND anio=? AND nroexpedi=?''',
               (item.get("num_doc"), item.get("aduana"), item.get("urd"),
                item.get("anio"), item.get("nroexpedi")))
@@ -1090,56 +1090,56 @@ def upsert_archivar_echasqui(item):
     return int(row[0]) if row else -1
 
 
-def listar_archivar_echasqui():
-    """Lista todos los pendientes de archivado echasqui."""
-    crear_tabla_archivar_echasqui()
+def listar_archivar_repositorio():
+    """Lista todos los pendientes de archivado repositorio."""
+    crear_tabla_archivar_repositorio()
     conn = get_db_connection()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     c.execute('''SELECT id, num_doc, ruc, num_ri, aduana, urd, anio, nroexpedi,
                         denom, estado, mensaje, fecha_registro
-                 FROM tabla_archivar_echasqui ORDER BY num_doc, id''')
+                 FROM tabla_archivar_repositorio ORDER BY num_doc, id''')
     rows = [dict(r) for r in c.fetchall()]
     conn.close()
     return rows
 
 
-def marcar_archivar_echasqui_error(id_fila, mensaje):
+def marcar_archivar_repositorio_error(id_fila, mensaje):
     """Marca un pendiente como 'error' con su motivo."""
     conn = get_db_connection()
-    conn.execute("UPDATE tabla_archivar_echasqui SET estado='error', mensaje=? WHERE id=?",
+    conn.execute("UPDATE tabla_archivar_repositorio SET estado='error', mensaje=? WHERE id=?",
                  (str(mensaje)[:500], int(id_fila)))
     conn.commit()
     conn.close()
 
 
-def marcar_archivar_echasqui_pendiente(id_fila, mensaje):
+def marcar_archivar_repositorio_pendiente(id_fila, mensaje):
     """Marca un pendiente como 'pendiente' con su motivo (no lo elimina)."""
     conn = get_db_connection()
-    conn.execute("UPDATE tabla_archivar_echasqui SET estado='pendiente', mensaje=? WHERE id=?",
+    conn.execute("UPDATE tabla_archivar_repositorio SET estado='pendiente', mensaje=? WHERE id=?",
                  (str(mensaje)[:500], int(id_fila)))
     conn.commit()
     conn.close()
 
 
-def eliminar_archivar_echasqui(ids):
+def eliminar_archivar_repositorio(ids):
     """Elimina los pendientes cuyos id estén en ``ids``. Devuelve cuántos."""
     ids = [int(i) for i in (ids or [])]
     if not ids:
         return 0
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute(f"DELETE FROM tabla_archivar_echasqui WHERE id IN ({','.join('?'*len(ids))})", ids)
+    c.execute(f"DELETE FROM tabla_archivar_repositorio WHERE id IN ({','.join('?'*len(ids))})", ids)
     n = c.rowcount
     conn.commit()
     conn.close()
     return n
 
 
-def borrar_archivar_echasqui():
-    """Vacía la cola de archivado echasqui."""
+def borrar_archivar_repositorio():
+    """Vacía la cola de archivado repositorio."""
     conn = get_db_connection()
-    conn.execute("DELETE FROM tabla_archivar_echasqui")
+    conn.execute("DELETE FROM tabla_archivar_repositorio")
     conn.commit()
     conn.close()
 
@@ -1509,7 +1509,7 @@ def obtener_datos_incluye_archivo(lista_num_doc):
     ``tabla_bd``, cae de vuelta a ``tabla_bd_archivo`` (casos archivados).
 
     Pensado para flujos que también deben operar sobre casos archivados (p. ej.
-    verificar echasqui electrónico). NO altera ``obtener_datos_para_envio``, que
+    verificar repositorio electrónico). NO altera ``obtener_datos_para_envio``, que
     debe seguir viendo solo casos activos.
     """
     lista = [str(d).strip() for d in (lista_num_doc or []) if str(d).strip()]
@@ -1555,7 +1555,7 @@ def dato_asign(num_doc, columna):
     """Valor de ``columna`` en tabla_asign para ``num_doc`` (activa → archivo).
 
     Existe porque ``obtener_datos_para_envio`` sirve las filas desde ``tabla_bd``,
-    que NO es la fuente de verdad de varias columnas: ``exp_echasqui`` solo vive
+    que NO es la fuente de verdad de varias columnas: ``exp_repositorio`` solo vive
     en tabla_asign, y ``num_dev`` se rellena ahí (flujo_sync hace el backfill
     tabla_bd → tabla_asign, nunca al revés), de modo que en tabla_bd puede
     quedar vacío indefinidamente.

@@ -1,4 +1,4 @@
-export interface ResultadoPptt {
+export interface ResultadoPapelesTrabajo {
   ok: boolean;
   mensaje: string;
   okCount?: number;
@@ -11,12 +11,12 @@ export interface ResultadoPptt {
 }
 
 interface Props {
-  resultado: ResultadoPptt | null;
+  resultado: ResultadoPapelesTrabajo | null;
   onClose: () => void;
 }
 
 /**
- * Ventana emergente (modal bloqueante) con el resultado de "Generar PPTT".
+ * Ventana emergente (modal bloqueante) con el resultado de "Generar PAPELES_TRABAJO".
  * Muestra en verde cuando todo procedió bien o en rojo la lista de casos con error.
  */
 export function ResultadoModal({ resultado, onClose }: Props): JSX.Element | null {
@@ -25,8 +25,8 @@ export function ResultadoModal({ resultado, onClose }: Props): JSX.Element | nul
   const hayErrores = resultado.errores.length > 0;
   const esError = !resultado.ok || hayErrores;
   const titulo = esError
-    ? resultado.tituloError ?? "Generar PPTT — finalizó con errores"
-    : resultado.tituloExito ?? "Generar PPTT — completado";
+    ? resultado.tituloError ?? "Generar PAPELES_TRABAJO — finalizó con errores"
+    : resultado.tituloExito ?? "Generar PAPELES_TRABAJO — completado";
 
   return (
     <div

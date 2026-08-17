@@ -82,10 +82,10 @@ def _evaluar_un_caso(sesion, row, docs_archivados, ofs_elec, log) -> dict:
         "cod_tip_sol": str(_row_get(row, "cod_tip_sol")),
         "is_of_multiple": es_multiple,
         "carpeta_existe": existe,
-        "paso_pptt": existe,
+        "paso_papeles_trabajo": existe,
         "insumo_final": {"completo": existe, "faltantes": [], "puede_foliar": existe},
-        "exp_echasqui": {"registrado": existe, "valor": trabajo},
-        "echasquis": [],
+        "exp_repositorio": {"registrado": existe, "valor": trabajo},
+        "repositorios": [],
         "carga_1649": {"aplica": str(_row_get(row, "cod_for")) == "1649"},
         "indispensables": {"raiz": [], "subcarpetas": {}},
         "alertas": alertas,
@@ -166,13 +166,22 @@ def borrar_caso_completo(num_doc: str, borrar_carpeta: bool = False) -> dict:
     from MACRO.database import borrar_caso
 
     fila = _fila_de(num_doc)
-    if borrar_carpeta and fila:
-        shutil.rmtree(resolver_carpeta_caso(fila)[1], ignore_errors=True)
+    carpeta = resolver_carpeta_caso(fila)[1] if fila else ""
+    borrada = False
+    if borrar_carpeta and carpeta:
+        borrada = Path(carpeta).is_dir()
+        shutil.rmtree(carpeta, ignore_errors=True)
     try:
-        borrar_caso(str(num_doc))
-    except Exception as exc:  # noqa: BLE001
-        return resultado(False, f"No se pudo borrar: {exc}")
-    return resultado(True, f"Caso {num_doc} eliminado")
+        eliminadas = borrar_caso(str(num_doc)) or {}
+    except Exception:  # noqa: BLE001 — la respuesta debe mantener su forma
+        eliminadas = {}
+    if not isinstance(eliminadas, dict):
+        eliminadas = {"registros": int(bool(eliminadas))}
+    return {
+        "eliminadas": {k: int(v) for k, v in eliminadas.items() if isinstance(v, int)},
+        "carpeta_borrada": borrada,
+        "carpeta": carpeta,
+    }
 
 
 __all__ = [

@@ -10,10 +10,10 @@ ROOT = Path(SPECPATH).resolve().parent
 
 _datas = [(str(ROOT / "frontend" / "dist"), "frontend/dist")]
 
-# Paquete de automatización RSIRAT vendorizado (REF/Tiempos, Antecedentes). Se
-# incluye como DATOS (no como módulos) porque flujo_rsirat lo importa de forma
+# Paquete de automatización SISTEMA_LEGACY vendorizado (REF/Tiempos, Antecedentes). Se
+# incluye como DATOS (no como módulos) porque flujo_sistema_legacy lo importa de forma
 # dinámica insertando su carpeta en sys.path; PyInstaller no lo detectaría solo.
-# En el bundle queda en <_MEIPASS>/automatizaciones (ver flujo_rsirat._automatizaciones_dir).
+# En el bundle queda en <_MEIPASS>/automatizaciones (ver flujo_sistema_legacy._automatizaciones_dir).
 _automat = ROOT / "MACRO" / "automatizaciones"
 if _automat.exists():
     _datas.append((str(_automat), "automatizaciones"))
@@ -86,7 +86,7 @@ a = Analysis(
         "win32timezone",
     ] + collect_submodules("oracledb")       # driver Oracle (control de acceso)
       + collect_submodules("cryptography")   # oracledb thin lo usa (kdf/hashes/ciphers)
-      # Automatización RSIRAT (import dinámico): PyInstaller no ve pywinauto/pyautogui
+      # Automatización SISTEMA_LEGACY (import dinámico): PyInstaller no ve pywinauto/pyautogui
       # ni comtypes (backend UIA de pywinauto), así que se fuerzan sus submódulos.
       + collect_submodules("pywinauto")
       + collect_submodules("pyautogui")

@@ -2,16 +2,16 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 
 import { MenuCaso } from "./MenuCaso";
-import { descargas, itop } from "../../api/acciones";
+import { descargas, mesa_ayuda } from "../../api/acciones";
 
 vi.mock("../../api/acciones", () => ({
   descargas: {
     expElectronico: vi.fn(async () => "j"),
-    echasqui: vi.fn(async () => "j"),
+    repositorio: vi.fn(async () => "j"),
     tresUit: vi.fn(async () => "j"),
     porEjercicios: vi.fn(async () => "j"),
   },
-  itop: {
+  mesa_ayuda: {
     descarga: vi.fn(async () => "j"),
     modificar: vi.fn(async () => "j"),
     empleadores601: vi.fn(async () => ({ empleadores: [] })),
@@ -59,10 +59,10 @@ test("Rentas 4ta abre el modal y al confirmar lanza la descarga", async () => {
   );
   fireEvent.click(screen.getByText("Acciones del caso ▾"));
   fireEvent.click(screen.getByText("Rentas 4ta"));
-  // El modal aparece; confirmar dispara itop.descarga con tipo 4ta.
+  // El modal aparece; confirmar dispara mesa_ayuda.descarga con tipo 4ta.
   fireEvent.click(await screen.findByText("Confirmar y enviar"));
   await vi.waitFor(() =>
-    expect(itop.descarga).toHaveBeenCalledWith("4ta", expect.any(Object), {}));
+    expect(mesa_ayuda.descarga).toHaveBeenCalledWith("4ta", expect.any(Object), {}));
 });
 
 test("existe el ítem PDT 601 - empleador completo", () => {

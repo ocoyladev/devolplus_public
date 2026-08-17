@@ -31,6 +31,6 @@ DEFAULT_PATH_RI = r"D:\RI"
 DEFAULT_PATH_AUTORIZAR = r"D:\ENVIAR_AUTORIZAR"
 DEFAULT_PATH_ARCHIVO = r"D:\ARCHIVO"
 
-# Ejecutable de SIRAT (automatización RSIRAT: REF/Tiempos y Antecedentes).
-DEFAULT_PATH_SIRAT_EXE = r"C:\RSIRAT_new\sirat.exe"
+# Ejecutable de sistema legacy (automatización SISTEMA_LEGACY: REF/Tiempos y Antecedentes).
+DEFAULT_PATH_LEGACY_EXE = r"C:\SISTEMA_LEGACY_new\sistema_legacy.exe"
 

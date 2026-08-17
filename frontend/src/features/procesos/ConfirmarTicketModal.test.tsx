@@ -2,10 +2,10 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 
 import { ConfirmarTicketModal } from "./ConfirmarTicketModal";
-import { itop } from "../../api/acciones";
+import { mesa_ayuda } from "../../api/acciones";
 
 vi.mock("../../api/acciones", () => ({
-  itop: {
+  mesa_ayuda: {
     preview: vi.fn(async () => ({
       tipo: "4ta", of: "OF1", ruc: "10111111112", nombre: "PEPE",
       periodo_ini: 202401, periodo_fin: 202412,
@@ -40,13 +40,13 @@ test("601 sin empleadores en archivo pide RUC y nombre manual", async () => {
       onCancelar={() => {}}
     />,
   );
-  await waitFor(() => expect(itop.empleadores601).toHaveBeenCalled());
+  await waitFor(() => expect(mesa_ayuda.empleadores601).toHaveBeenCalled());
   expect(screen.getByLabelText(/RUC del empleador/i)).toBeInTheDocument();
   expect(screen.getByLabelText(/Nombre del empleador/i)).toBeInTheDocument();
 });
 
 test("601 limpia el error stale cuando un preview posterior tiene exito", async () => {
-  const previewMock = vi.mocked(itop.preview);
+  const previewMock = vi.mocked(mesa_ayuda.preview);
   previewMock
     .mockRejectedValueOnce(new Error("fallo de red"))
     .mockResolvedValueOnce({
@@ -64,7 +64,7 @@ test("601 limpia el error stale cuando un preview posterior tiene exito", async 
     />,
   );
 
-  await vi.waitFor(() => expect(itop.empleadores601).toHaveBeenCalled());
+  await vi.waitFor(() => expect(mesa_ayuda.empleadores601).toHaveBeenCalled());
 
   // Primer intento: falla y muestra el error.
   fireEvent.change(screen.getByLabelText(/RUC del empleador/i), {

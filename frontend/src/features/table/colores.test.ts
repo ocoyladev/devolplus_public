@@ -11,7 +11,7 @@ import {
 test("clave de color de RESULTADO por grupo", () => {
   expect(colorClaveDe("resultado", "AUTORIZADO TOTAL")).toBe("verde");
   expect(colorClaveDe("resultado", "DENEGADO")).toBe("verde");
-  expect(colorClaveDe("resultado", "ITOP")).toBe("naranja");
+  expect(colorClaveDe("resultado", "MESA_AYUDA")).toBe("naranja");
   expect(colorClaveDe("resultado", "")).toBe("sin");
 });
 

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request
 
 from MACRO.app.schemas.common import JobResponse
 from MACRO.app.schemas.mantenimiento import (
-    ArchivarEchasquiColaResponse,
+    ArchivarRepositorioColaResponse,
     BorrarCasoRequest,
     BorrarCasoResponse,
     DescargasColaResponse,
@@ -76,30 +76,30 @@ def borrar_caso_endpoint(body: BorrarCasoRequest) -> BorrarCasoResponse:
     return BorrarCasoResponse(**res)
 
 
-@router.get("/archivar-echasqui", response_model=ArchivarEchasquiColaResponse)
-def listar_archivar_echasqui_endpoint() -> ArchivarEchasquiColaResponse:
-    """Lista los pendientes de archivado echasqui."""
-    from MACRO.database import listar_archivar_echasqui
+@router.get("/archivar-repositorio", response_model=ArchivarRepositorioColaResponse)
+def listar_archivar_repositorio_endpoint() -> ArchivarRepositorioColaResponse:
+    """Lista los pendientes de archivado repositorio."""
+    from MACRO.database import listar_archivar_repositorio
 
-    return ArchivarEchasquiColaResponse(pendientes=listar_archivar_echasqui())
-
-
-@router.post("/archivar-echasqui/eliminar")
-def eliminar_archivar_echasqui_endpoint(body: IdsRequest) -> dict:
-    """Elimina pendientes de archivado echasqui por id."""
-    from MACRO.database import eliminar_archivar_echasqui
-
-    return {"eliminadas": eliminar_archivar_echasqui(body.ids)}
+    return ArchivarRepositorioColaResponse(pendientes=listar_archivar_repositorio())
 
 
-@router.post("/archivar-echasqui/ejecutar", response_model=JobResponse)
-def ejecutar_archivar_echasqui_endpoint(body: IdsRequest, request: Request) -> JobResponse:
+@router.post("/archivar-repositorio/eliminar")
+def eliminar_archivar_repositorio_endpoint(body: IdsRequest) -> dict:
+    """Elimina pendientes de archivado repositorio por id."""
+    from MACRO.database import eliminar_archivar_repositorio
+
+    return {"eliminadas": eliminar_archivar_repositorio(body.ids)}
+
+
+@router.post("/archivar-repositorio/ejecutar", response_model=JobResponse)
+def ejecutar_archivar_repositorio_endpoint(body: IdsRequest, request: Request) -> JobResponse:
     """Reintenta el archivado de los pendientes seleccionados (job)."""
-    from MACRO.flujos.flujo_archivar_echasqui import ejecutar_archivar_echasqui
+    from MACRO.flujos.flujo_archivar_repositorio import ejecutar_archivar_repositorio
 
     ids = list(body.ids)
 
     def tarea(progreso):
-        return ejecutar_archivar_echasqui(ids, progreso)
+        return ejecutar_archivar_repositorio(ids, progreso)
 
-    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="archivar_echasqui"))
+    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="archivar_repositorio"))

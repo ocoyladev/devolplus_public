@@ -78,7 +78,7 @@ test("RESULTADO tiene relleno de color por estado", () => {
   const [r] = construirColumnas(["resultado"], "default");
   const style = r.cellStyle as (p: { value: unknown }) => unknown;
   expect(style({ value: "DENEGADO" })).toEqual({ backgroundColor: "#C8E6C9" });
-  expect(style({ value: "ITOP" })).toEqual({ backgroundColor: "#FFE0B2" });
+  expect(style({ value: "MESA_AYUDA" })).toEqual({ backgroundColor: "#FFE0B2" });
   expect(style({ value: "OTRO" })).toBeNull();
 });
 
@@ -96,19 +96,19 @@ test("campoDeField mapea campos de grilla a campos de la API", () => {
   expect(campoDeField("nombre")).toBeNull();
 });
 
-test("incluye columna Exp. ECHASQUI no editable al final en modo default", () => {
+test("incluye columna Exp. REPOSITORIO no editable al final en modo default", () => {
   const cols = construirColumnas(
-    ["num_doc", "resultado", "obs_devol", "exp_echasqui"],
+    ["num_doc", "resultado", "obs_devol", "exp_repositorio"],
     "default",
     true,
   );
-  const exp = cols.find((c) => c.field === "exp_echasqui");
+  const exp = cols.find((c) => c.field === "exp_repositorio");
   expect(exp).toBeDefined();
-  expect(exp?.headerName).toBe("Exp. ECHASQUI");
+  expect(exp?.headerName).toBe("Exp. REPOSITORIO");
   expect(exp?.width).toBe(450);
   expect(exp?.editable).toBeFalsy();
   // Debe ir después de Observaciones.
   const idxObs = cols.findIndex((c) => c.field === "obs_devol");
-  const idxExp = cols.findIndex((c) => c.field === "exp_echasqui");
+  const idxExp = cols.findIndex((c) => c.field === "exp_repositorio");
   expect(idxExp).toBeGreaterThan(idxObs);
 });

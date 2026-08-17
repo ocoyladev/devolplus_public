@@ -35,11 +35,11 @@ def test_post_recuperar_lanza_job() -> None:
     assert fake.calls == ["recuperar"]
 
 
-def test_post_pptt_lanza_job() -> None:
+def test_post_papeles_trabajo_lanza_job() -> None:
     client, fake = _client_with_fake()
-    resp = client.post("/api/procesos/pptt", json={"num_docs": ["1", "2"]})
+    resp = client.post("/api/procesos/papeles-trabajo", json={"num_docs": ["1", "2"]})
     assert resp.status_code == 200
-    assert fake.calls == ["pptt"]
+    assert fake.calls == ["papeles_trabajo"]
 
 
 def test_post_carga_expedientes_lanza_job() -> None:
@@ -121,42 +121,42 @@ def test_post_autorizar_pre_check_devuelve_conflictos(monkeypatch) -> None:
     }
 
 
-def test_post_verificar_echasqui_sincrono(monkeypatch) -> None:
-    import MACRO.flujos.flujo_verificar_echasqui as fv
+def test_post_verificar_repositorio_sincrono(monkeypatch) -> None:
+    import MACRO.flujos.flujo_verificar_repositorio as fv
 
     monkeypatch.setattr(
-        fv, "verificar_exp_echasqui",
+        fv, "verificar_exp_repositorio",
         lambda num_docs, callback_progreso=None: {"casos": [{
             "num_doc": "111", "num_dev": "D", "num_ruc": "R", "nombre": "N",
             "tipo_exp": "ELECTRONICO",
-            "echasquis": [
+            "repositorios": [
                 {"denom": "000-URD999-2026-1-1", "clasificacion": "VIA_ESPECIAL",
                  "estado": "subido", "subible": False},
                 {"denom": "000-URD999-2026-2-1", "clasificacion": "VIA_ESPECIAL",
                  "estado": "pendiente_subir", "subible": True},
             ],
-            "sin_echasqui": False, "error": "",
+            "sin_repositorio": False, "error": "",
         }]},
     )
     client, _ = _client_with_fake()
-    resp = client.post("/api/procesos/verificar-echasqui", json={"num_docs": ["111"]})
+    resp = client.post("/api/procesos/verificar-repositorio", json={"num_docs": ["111"]})
     assert resp.status_code == 200
     caso = resp.json()["casos"][0]
     assert caso["tipo_exp"] == "ELECTRONICO"
-    est = {e["denom"]: e for e in caso["echasquis"]}
+    est = {e["denom"]: e for e in caso["repositorios"]}
     assert est["000-URD999-2026-2-1"]["subible"] is True
     assert est["000-URD999-2026-1-1"]["estado"] == "subido"
 
 
-def test_post_subir_echasqui_lanza_job() -> None:
+def test_post_subir_repositorio_lanza_job() -> None:
     client, fake = _client_with_fake()
     resp = client.post(
-        "/api/procesos/verificar-echasqui/subir",
+        "/api/procesos/verificar-repositorio/subir",
         json={"items": [{"num_doc": "111", "num_dev": "D", "num_ruc": "R",
                          "denom": "000-URD999-2026-2-1"}]},
     )
     assert resp.status_code == 200
-    assert fake.calls == ["subir_echasqui"]
+    assert fake.calls == ["subir_repositorio"]
 
 
 def test_validar_archivo_emite_avance_por_caso(monkeypatch):

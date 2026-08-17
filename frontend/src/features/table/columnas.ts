@@ -24,7 +24,7 @@ export const LABELS: Record<string, string> = {
   fec_ri: "Fecha RI",
   carta: "Carta",
   obs_devol: "Observaciones",
-  exp_echasqui: "Exp. ECHASQUI",
+  exp_repositorio: "Exp. REPOSITORIO",
   num_dev: "N° Dev.",
   DESCARGAS: "Descargas",
 };
@@ -37,7 +37,7 @@ export const RESULTADO_OPCIONES = [
   "IMPROCEDENTE",
   "DESISTIDO",
   "CARTA ENVIADA",
-  "ITOP",
+  "MESA_AYUDA",
   "MIGRACIONES",
 ];
 export const FORMA_DEV_OPCIONES = ["Abono en cuenta", "OPF", "Cheque"];
@@ -89,7 +89,7 @@ const ANCHOS: Record<string, number> = {
   NIDI: 60,
   num_dev: 110,
   obs_devol: 450, // doble del ancho de Flet (300)
-  exp_echasqui: 450, // igual que Resultado
+  exp_repositorio: 450, // igual que Resultado
 };
 
 // Campos cuyo valor es una fecha DD/MM/YYYY (orden cronológico, no textual).
@@ -117,7 +117,7 @@ const DEFAULT_SPEC: { header: string; fields: string[] }[] = [
   { header: "NIDI", fields: ["NIDI"] },
   { header: "Exp. Electrónico", fields: ["num_dev"] },
   { header: "Observaciones", fields: ["obs_devol"] },
-  { header: "Exp. ECHASQUI", fields: ["exp_echasqui"] },
+  { header: "Exp. REPOSITORIO", fields: ["exp_repositorio"] },
 ];
 
 export type ModoColumnas = "default" | "todas";

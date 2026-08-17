@@ -9,9 +9,9 @@ def test_validar_archivo_endpoint_ok():
     fake = {"casos": [{
         "num_doc": "D1", "num_dev": "", "num_ruc": "", "nombre": "", "of_devolucion": "",
         "tipo_exp": "FISICO", "is_of_multiple": False, "carpeta_existe": True,
-        "paso_pptt": True,
+        "paso_papeles_trabajo": True,
         "insumo_final": {"completo": True, "faltantes": [], "puede_foliar": False},
-        "exp_echasqui": {"registrado": True, "valor": "", "autoregistrado": False},
+        "exp_repositorio": {"registrado": True, "valor": "", "autoregistrado": False},
         "carga_1649": {"aplica": False, "local": {"reportes": False, "cedula": False},
                        "remoto": "na", "remoto_reportes": False, "remoto_cedula": False},
         "indispensables": {"raiz": [], "subcarpetas": {}},

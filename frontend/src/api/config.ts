@@ -3,7 +3,7 @@ export interface RutasConfig {
   PATH_RI: string | null;
   PATH_AUTORIZAR: string | null;
   PATH_ARCHIVO: string | null;
-  PATH_SIRAT_EXE: string | null;
+  PATH_LEGACY_EXE: string | null;
   UNIDAD_ORGANICA_FOLIO: string | null;
 }
 

@@ -5,14 +5,14 @@ from __future__ import annotations
 import fnmatch
 import os
 
-# Elementos esperados dentro de ARCHIVOS_FINALES (insumo final del proceso PPTT).
+# Elementos esperados dentro de ARCHIVOS_FINALES (insumo final del proceso PAPELES_TRABAJO).
 INSUMO_FINAL: dict[str, list[str]] = {
     "ELECTRONICO": ["reportes_internos.pdf", "cedula_verificacion.pdf"],
     "FISICO": ["IMPR.pdf", "RI_IMPR.pdf"],
     # VIRTUAL se evalúa por patrón (consolidado / _FOLIADO), no por nombre fijo.
 }
 
-_SUBCARPETAS_PPTT = ("ARCHIVOS_INICIALES", "ARCHIVOS_FINALES", "PPTT")
+_SUBCARPETAS_PAPELES_TRABAJO = ("ARCHIVOS_INICIALES", "ARCHIVOS_FINALES", "PAPELES_TRABAJO")
 
 
 def existe_patron(directorio: str, patron: str) -> bool:
@@ -114,16 +114,16 @@ def _visibilidad_carga(carga: dict) -> list[tuple[str, str]]:
             for nombre, clave_remota, clave_vis in pares if carga.get(clave_remota)]
 
 
-def echasqui_reales(echasqui_dir: str) -> list[str]:
-    """Subcarpetas de ECHASQUI con al menos un archivo (recursivo).
+def repositorio_reales(repositorio_dir: str) -> list[str]:
+    """Subcarpetas de REPOSITORIO con al menos un archivo (recursivo).
 
     Ignora placeholders vacíos que no referencian ningún expediente (fuente de
     falsas alertas)."""
-    if not echasqui_dir or not os.path.isdir(echasqui_dir):
+    if not repositorio_dir or not os.path.isdir(repositorio_dir):
         return []
     reales = []
-    for nombre in sorted(os.listdir(echasqui_dir)):
-        sub = os.path.join(echasqui_dir, nombre)
+    for nombre in sorted(os.listdir(repositorio_dir)):
+        sub = os.path.join(repositorio_dir, nombre)
         if not os.path.isdir(sub):
             continue
         if any(files for _root, _dirs, files in os.walk(sub)):
@@ -131,11 +131,11 @@ def echasqui_reales(echasqui_dir: str) -> list[str]:
     return reales
 
 
-def evaluar_paso_pptt(carpeta: str) -> bool:
-    """True si existen las tres subcarpetas que crea 'Generar PPTT'."""
+def evaluar_paso_papeles_trabajo(carpeta: str) -> bool:
+    """True si existen las tres subcarpetas que crea 'Generar PAPELES_TRABAJO'."""
     if not carpeta or not os.path.isdir(carpeta):
         return False
-    return all(os.path.isdir(os.path.join(carpeta, s)) for s in _SUBCARPETAS_PPTT)
+    return all(os.path.isdir(os.path.join(carpeta, s)) for s in _SUBCARPETAS_PAPELES_TRABAJO)
 
 
 def detectar_consolidado_foliado(af_dir: str) -> tuple[bool, bool]:
@@ -180,7 +180,7 @@ def evaluar_insumo_final(af_dir: str, tipo: str) -> dict:
 # Patrones indispensables (glob, case-insensitive). "(I)" en el spec.
 _IND_ELECTRONICO = ["*_planeamiento.pdf", "MACRO.xlsx", "Reporte de Tareas*.pdf", "REF.pdf"]
 _IND_FISICO = _IND_ELECTRONICO + ["RI_*_NOT.pdf", "RI_*.pdf", "Consulta Detalle*", "*_of.pdf"]
-_IND_VIRTUAL = _IND_FISICO + ["ECHASQUI"]
+_IND_VIRTUAL = _IND_FISICO + ["REPOSITORIO"]
 _IND_MULTIPLE_RAIZ = ["*_planeamiento.pdf", "Reporte de Tareas*.pdf", "REF.pdf", "Consulta Detalle*"]
 _IND_MULTIPLE_SUB = ["MACRO.xlsx", "RI_*_NOT.pdf", "RI_*.pdf"]
 
@@ -222,7 +222,7 @@ def construir_alertas(caso: dict) -> None:
         caso["nivel"] = "error"
         return
 
-    # Una rectificatoria (tipo 12) no arma PPTT propio: hereda ARCHIVOS_FINALES
+    # Una rectificatoria (tipo 12) no arma PAPELES_TRABAJO propio: hereda ARCHIVOS_FINALES
     # de su solicitud de origen. No se le exigen subcarpetas ni indispensables.
     es_t12 = bool(caso.get("es_tipo12"))
 
@@ -235,58 +235,58 @@ def construir_alertas(caso: dict) -> None:
         insumo = caso["insumo_final"]
         if not insumo["completo"]:
             faltan = ", ".join(insumo["faltantes"]) or "elementos"
-            # 'pptt' a secas correría solo sobre la rectificatoria y caería en el
+            # 'papeles_trabajo' a secas correría solo sobre la rectificatoria y caería en el
             # camino SINGLE, que la rechaza por no tener origen: hay que rehacer
             # la OF entera para que el origen se arme y le herede su armado.
             alertas.append({"codigo": "insumo_incompleto", "severidad": "error",
                             "mensaje": f"ARCHIVOS_FINALES incompleto: falta {faltan}. "
-                                       "Se hereda del origen al regenerar el PPTT "
+                                       "Se hereda del origen al regenerar el PAPELES_TRABAJO "
                                        "de la OF completa.",
-                            "accion": "pptt_of"})
-    elif not caso["paso_pptt"]:
-        alertas.append({"codigo": "sin_pptt", "severidad": "error",
-                        "mensaje": "No pasó por 'Generar PPTT' (faltan subcarpetas).",
-                        "accion": "pptt"})
+                            "accion": "papeles_trabajo_of"})
+    elif not caso["paso_papeles_trabajo"]:
+        alertas.append({"codigo": "sin_papeles_trabajo", "severidad": "error",
+                        "mensaje": "No pasó por 'Generar PAPELES_TRABAJO' (faltan subcarpetas).",
+                        "accion": "papeles_trabajo"})
     else:
         insumo = caso["insumo_final"]
         if not insumo["completo"]:
-            accion = "foliar" if insumo["puede_foliar"] else "pptt_revertir"
+            accion = "foliar" if insumo["puede_foliar"] else "papeles_trabajo_revertir"
             faltan = ", ".join(insumo["faltantes"]) or "elementos"
             alertas.append({"codigo": "insumo_incompleto", "severidad": "error",
                             "mensaje": f"ARCHIVOS_FINALES incompleto: falta {faltan}.",
                             "accion": accion})
 
-    exp = caso["exp_echasqui"]
-    echasquis = caso.get("echasquis", [])
-    if caso["tipo_exp"] in ("ELECTRONICO", "VIRTUAL") and echasquis \
+    exp = caso["exp_repositorio"]
+    repositorios = caso.get("repositorios", [])
+    if caso["tipo_exp"] in ("ELECTRONICO", "VIRTUAL") and repositorios \
             and not exp["registrado"] and not exp["autoregistrado"]:
-        # En una tipo 12 la columna la puebla 'Generar PPTT' desde el origen: no
-        # hay ECHASQUI local que registrar, así que no se ofrece esa acción.
-        alertas.append({"codigo": "exp_echasqui_faltante", "severidad": "advertencia",
-                        "mensaje": "Hay ECHASQUI pero la columna Exp. ECHASQUI está vacía.",
-                        "accion": "" if es_t12 else "registrar_echasqui"})
+        # En una tipo 12 la columna la puebla 'Generar PAPELES_TRABAJO' desde el origen: no
+        # hay REPOSITORIO local que registrar, así que no se ofrece esa acción.
+        alertas.append({"codigo": "exp_repositorio_faltante", "severidad": "advertencia",
+                        "mensaje": "Hay REPOSITORIO pero la columna Exp. REPOSITORIO está vacía.",
+                        "accion": "" if es_t12 else "registrar_repositorio"})
     if caso["tipo_exp"] in ("ELECTRONICO", "VIRTUAL"):
-        for it in echasquis:
+        for it in repositorios:
             if it["estado"] == "pendiente_subir":
-                # 'subir_echasqui' (vía especial), NO 'cargar_expediente': esta
+                # 'subir_repositorio' (vía especial), NO 'cargar_expediente': esta
                 # última carga reportes_internos/cedula al 1649, que es otra cosa.
                 # El denom viaja aparte porque la acción lo necesita como insumo.
-                alertas.append({"codigo": "echasqui_item", "severidad": "advertencia",
-                                "mensaje": f"Echasqui '{it['denom']}' no figura en el "
+                alertas.append({"codigo": "repositorio_item", "severidad": "advertencia",
+                                "mensaje": f"Repositorio '{it['denom']}' no figura en el "
                                            "expediente electrónico.",
-                                "accion": "subir_echasqui", "item": it["denom"]})
+                                "accion": "subir_repositorio", "item": it["denom"]})
             elif it["estado"] == "manual":
                 # 'pdf_ok' (el <denom>.pdf compilado ya está en ARCHIVOS_INICIALES)
-                # no cae aquí a propósito: ese echasqui ya se incorporó y no
+                # no cae aquí a propósito: ese repositorio ya se incorporó y no
                 # necesita intervención.
-                alertas.append({"codigo": "echasqui_item", "severidad": "advertencia",
-                                "mensaje": f"Echasqui '{it['denom']}' requiere evaluación "
+                alertas.append({"codigo": "repositorio_item", "severidad": "advertencia",
+                                "mensaje": f"Repositorio '{it['denom']}' requiere evaluación "
                                            "manual: no se sube automáticamente y no se "
                                            "encontró su PDF en ARCHIVOS_INICIALES.",
                                 "accion": ""})
             elif it["estado"] == "no_verificado":
-                alertas.append({"codigo": "echasqui_item", "severidad": "advertencia",
-                                "mensaje": f"Echasqui '{it['denom']}': no se pudo verificar "
+                alertas.append({"codigo": "repositorio_item", "severidad": "advertencia",
+                                "mensaje": f"Repositorio '{it['denom']}': no se pudo verificar "
                                            "(sin Portal).",
                                 "accion": ""})
 
@@ -325,7 +325,7 @@ def construir_alertas(caso: dict) -> None:
 
     faltan_ind = _faltantes_indispensables(caso["indispensables"])
     if faltan_ind:
-        sev = "error" if caso["paso_pptt"] else "advertencia"
+        sev = "error" if caso["paso_papeles_trabajo"] else "advertencia"
         alertas.append({"codigo": "indispensable_faltante", "severidad": sev,
                         "mensaje": "Faltan indispensables: " + ", ".join(faltan_ind) + ".",
                         "accion": "abrir_carpeta"})

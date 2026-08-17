@@ -6,7 +6,7 @@ from typing import Any, Literal
 from pydantic import BaseModel
 
 
-class DescargaEchasquiRequest(BaseModel):
+class DescargaRepositorioRequest(BaseModel):
     # Fila de la grilla (provee of_devolucion/ruc/nombre/num_doc/is_of_multiple
     # que get_case_folder necesita para ubicar la carpeta del caso).
     row: dict[str, Any]
@@ -65,13 +65,13 @@ class NumeracionCartasRequest(BaseModel):
     filas: list[dict[str, Any]]
 
 
-class RsiratMasivoRequest(BaseModel):
+class SistemaLegacyMasivoRequest(BaseModel):
     # Filas seleccionadas; cada una provee of_devolucion/ruc/nombre/periodo
-    # (per_doc) para la automatización RSIRAT (REF/Tiempos o Antecedentes).
+    # (per_doc) para la automatización SISTEMA_LEGACY (REF/Tiempos o Antecedentes).
     filas: list[dict[str, Any]]
 
 
-class RsiratPreflightRequest(BaseModel):
+class SistemaLegacyPreflightRequest(BaseModel):
     # 'ref' (REF + Reporte de Tareas) o 'antec' (Fichas REF).
     tipo: Literal["ref", "antec"]
     filas: list[dict[str, Any]]

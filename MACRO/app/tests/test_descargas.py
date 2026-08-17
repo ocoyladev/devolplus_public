@@ -12,25 +12,25 @@ class FakeJobs:
         return "job-xyz"
 
 
-def test_post_echasqui_lanza_job_con_kind_y_num_doc() -> None:
+def test_post_repositorio_lanza_job_con_kind_y_num_doc() -> None:
     app = create_app()
     fake = FakeJobs()
     app.state.jobs = fake
     client = TestClient(app)
     resp = client.post(
-        "/api/descargas/echasqui",
+        "/api/descargas/repositorio",
         json={"row": {"num_doc": "D1"}, "expedientes": ["E1", "E2"]},
     )
     assert resp.status_code == 200
     assert resp.json() == {"job_id": "job-xyz"}
-    assert fake.calls == [("descarga_echasqui", "D1")]
+    assert fake.calls == [("descarga_repositorio", "D1")]
 
 
-def test_post_echasqui_valida_body() -> None:
+def test_post_repositorio_valida_body() -> None:
     app = create_app()
     app.state.jobs = FakeJobs()
     client = TestClient(app)
-    resp = client.post("/api/descargas/echasqui", json={"row": {"num_doc": "D1"}})
+    resp = client.post("/api/descargas/repositorio", json={"row": {"num_doc": "D1"}})
     assert resp.status_code == 422  # falta 'expedientes'
 
 
@@ -169,7 +169,7 @@ def test_ri_single_acepta_archivo() -> None:
     assert r.status_code == 200
 
 
-def test_post_rsirat_preflight_devuelve_la_verificacion_sin_job() -> None:
+def test_post_sistema_legacy_preflight_devuelve_la_verificacion_sin_job() -> None:
     """El preflight es síncrono: responde el detalle por caso y NO crea un job."""
     app = create_app()
     fake = FakeJobs()
@@ -177,7 +177,7 @@ def test_post_rsirat_preflight_devuelve_la_verificacion_sin_job() -> None:
     client = TestClient(app)
 
     resp = client.post(
-        "/api/descargas/rsirat-preflight",
+        "/api/descargas/sistema-legacy-preflight",
         json={"tipo": "ref", "filas": []},
     )
 
@@ -186,12 +186,12 @@ def test_post_rsirat_preflight_devuelve_la_verificacion_sin_job() -> None:
     assert fake.calls == []
 
 
-def test_post_rsirat_preflight_rechaza_tipo_desconocido() -> None:
+def test_post_sistema_legacy_preflight_rechaza_tipo_desconocido() -> None:
     app = create_app()
     app.state.jobs = FakeJobs()
     client = TestClient(app)
     resp = client.post(
-        "/api/descargas/rsirat-preflight",
+        "/api/descargas/sistema-legacy-preflight",
         json={"tipo": "otro", "filas": []},
     )
     assert resp.status_code == 422

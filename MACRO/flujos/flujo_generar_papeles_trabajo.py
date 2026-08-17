@@ -16,7 +16,7 @@ def es_tipo_12(item) -> bool:
     return cod_tip_sol_de(item) in {"01", "02"}
 
 
-def procesar_generar_pptt(lista_num_doc, callback_progreso=None,
+def procesar_generar_papeles_trabajo(lista_num_doc, callback_progreso=None,
                           solicitar_password=None, solicitar_eleccion=None):
     """Genera el papel de trabajo de cada caso indicado."""
     log = log_de(callback_progreso)
@@ -33,4 +33,4 @@ def procesar_generar_pptt(lista_num_doc, callback_progreso=None,
     )
 
 
-__all__ = ["procesar_generar_pptt", "es_tipo_12", "cod_tip_sol_de"]
+__all__ = ["procesar_generar_papeles_trabajo", "es_tipo_12", "cod_tip_sol_de"]

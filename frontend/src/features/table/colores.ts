@@ -7,7 +7,7 @@ export const COLOR_RESULTADO: Record<string, string> = {
   DENEGADO: "#C8E6C9",
   IMPROCEDENTE: "#C8E6C9",
   DESISTIDO: "#C8E6C9",
-  ITOP: "#FFE0B2",
+  MESA_AYUDA: "#FFE0B2",
   MIGRACIONES: "#FFE0B2",
   "CARTA ENVIADA": "#FFE0B2",
 };

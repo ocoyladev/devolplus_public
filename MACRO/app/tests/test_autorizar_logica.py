@@ -115,9 +115,22 @@ def test_prechequear_resume_decisiones_y_errores():
     assert len(r["errores"]) == 1
 
 
-def test_prechequear_marca_como_conflicto_la_fila_sin_resultado():
-    r = prechequear_autorizar(["3154500;;100"])
-    assert [c["num_doc"] for c in r["conflictos"]] == ["3154500"]
+def test_prechequear_separa_los_conflictos_por_casilla():
+    """El router mapea ``c65`` a ``ConflictoAutorizar`` y ``c64`` a
+    ``ConflictoC64``: cada lista debe traer exactamente los campos de su
+    esquema, o el endpoint falla al serializar."""
+    r = prechequear_autorizar(["3154500;Aut.total;0"])
+
+    assert set(r) >= {"c65", "c64", "decisiones", "errores", "ok"}
+    assert [c["num_doc"] for c in r["c65"]] == ["3154500"]
+    assert set(r["c65"][0]) == {"num_doc", "per_doc", "nombre", "c89"}
+    assert set(r["c64"][0]) == {"num_doc", "per_doc", "nombre", "g58"}
+
+
+def test_prechequear_sin_conflicto_cuando_el_resultado_no_autoriza():
+    r = prechequear_autorizar(["3154500;Denegado;0"])
+    assert r["c65"] == []
+    assert r["c64"] == []
 
 
 # --- filtrado de decisiones -------------------------------------------------

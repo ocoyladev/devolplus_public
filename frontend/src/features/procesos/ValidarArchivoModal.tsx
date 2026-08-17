@@ -19,9 +19,9 @@ interface Props {
   onError: (mensaje: string) => void;
 }
 
-// 'pptt_of' queda fuera a propósito: rehace la OF entera, y varias rectificatorias
+// 'papeles_trabajo_of' queda fuera a propósito: rehace la OF entera, y varias rectificatorias
 // de una misma OF la lanzarían repetida. Se ofrece solo como botón individual.
-const AUTO_SUBSANABLES = new Set(["pptt", "pptt_revertir", "foliar", "registrar_echasqui"]);
+const AUTO_SUBSANABLES = new Set(["papeles_trabajo", "papeles_trabajo_revertir", "foliar", "registrar_repositorio"]);
 
 const COLOR_NIVEL: Record<string, string> = {
   ok: "border-green-300 bg-green-50",
@@ -30,13 +30,13 @@ const COLOR_NIVEL: Record<string, string> = {
 };
 
 const LABEL_ACCION: Record<string, string> = {
-  pptt: "Generar PPTT",
-  pptt_of: "Regenerar PPTT de la OF",
-  pptt_revertir: "Revertir + regenerar PPTT",
+  papeles_trabajo: "Generar PAPELES_TRABAJO",
+  papeles_trabajo_of: "Regenerar PAPELES_TRABAJO de la OF",
+  papeles_trabajo_revertir: "Revertir + regenerar PAPELES_TRABAJO",
   foliar: "Foliar consolidado",
-  registrar_echasqui: "Registrar Exp. ECHASQUI",
+  registrar_repositorio: "Registrar Exp. REPOSITORIO",
   cargar_expediente: "Cargar expediente electrónico",
-  subir_echasqui: "Subir echasqui al expediente",
+  subir_repositorio: "Subir repositorio al expediente",
   abrir_carpeta: "Abrir carpeta",
 };
 
@@ -117,15 +117,15 @@ export function ValidarArchivoModal({
       await lanzarJob("carga_expedientes", () => procesos.cargaExpedientes([caso.num_doc]));
       return;
     }
-    // Subida de un echasqui por vía especial (la misma que hace Generar PPTT).
-    if (alerta.accion === "subir_echasqui") {
+    // Subida de un repositorio por vía especial (la misma que hace Generar PAPELES_TRABAJO).
+    if (alerta.accion === "subir_repositorio") {
       const denom = alerta.item ?? "";
       if (!denom) {
-        onError("La alerta no indica qué echasqui subir.");
+        onError("La alerta no indica qué repositorio subir.");
         return;
       }
-      await lanzarJob("subir_echasqui", () =>
-        procesos.subirEchasquiPendientes([
+      await lanzarJob("subir_repositorio", () =>
+        procesos.subirRepositorioPendientes([
           { num_doc: caso.num_doc, num_dev: caso.num_dev, num_ruc: caso.num_ruc, denom },
         ]),
       );
@@ -209,7 +209,7 @@ export function ValidarArchivoModal({
                       </span>
                     ) : null}
                     {/* Rectificatoria: hereda el armado del origen, por eso no se
-                        le exigen PPTT propio ni indispensables. */}
+                        le exigen PAPELES_TRABAJO propio ni indispensables. */}
                     {c.es_tipo12 ? (
                       <span
                         title="Rectificatoria: hereda ARCHIVOS_FINALES de su solicitud de origen"

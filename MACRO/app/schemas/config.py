@@ -9,7 +9,7 @@ class RutasConfig(BaseModel):
     PATH_RI: str | None = None
     PATH_AUTORIZAR: str | None = None
     PATH_ARCHIVO: str | None = None
-    PATH_SIRAT_EXE: str | None = None
+    PATH_LEGACY_EXE: str | None = None
     UNIDAD_ORGANICA_FOLIO: str | None = None
 
 

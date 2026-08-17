@@ -8,10 +8,10 @@ test("no renderiza nada sin corrida", () => {
   expect(container).toBeEmptyDOMElement();
 });
 
-test("RSIRAT muestra advertencia de teclado/mouse", () => {
+test("SISTEMA_LEGACY muestra advertencia de teclado/mouse", () => {
   render(
     <EjecucionOverlay
-      run={{ kind: "rsirat_ref", log: ["-> REF.pdf"], done: 1, total: 3, etiqueta: "OF 26001" }}
+      run={{ kind: "sistema_legacy_ref", log: ["-> REF.pdf"], done: 1, total: 3, etiqueta: "OF 26001" }}
     />,
   );
   expect(screen.getByText(/NO use el teclado ni el mouse/i)).toBeInTheDocument();

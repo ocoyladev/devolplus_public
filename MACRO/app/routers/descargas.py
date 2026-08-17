@@ -8,31 +8,31 @@ from MACRO.app.schemas.descargas import (
     Descarga3uitRequest,
     DescargaCartaMasivoRequest,
     DescargaCartaRequest,
-    DescargaEchasquiRequest,
+    DescargaRepositorioRequest,
     DescargaEjerciciosRequest,
     DescargaExpElectronicoRequest,
     DescargaPlaneamientoRequest,
     DescargaRiMasivoRequest,
     DescargaRiRequest,
     NumeracionCartasRequest,
-    RsiratMasivoRequest,
-    RsiratPreflightRequest,
+    SistemaLegacyMasivoRequest,
+    SistemaLegacyPreflightRequest,
 )
 
 router = APIRouter(prefix="/api/descargas", tags=["descargas"])
 
 
-@router.post("/echasqui", response_model=JobResponse)
-def descargar_echasqui(body: DescargaEchasquiRequest, request: Request) -> JobResponse:
-    """Lanza la descarga de expediente(s) E-Chasqui para un caso (job)."""
-    from MACRO.flujos.flujo_echasqui import descargar_expedientes_caso
+@router.post("/repositorio", response_model=JobResponse)
+def descargar_repositorio(body: DescargaRepositorioRequest, request: Request) -> JobResponse:
+    """Lanza la descarga de expediente(s) E-Doc para un caso (job)."""
+    from MACRO.flujos.flujo_repositorio import descargar_expedientes_caso
 
     num_doc = str(body.row.get("num_doc", "")).strip()
 
     def tarea(progreso):
         return descargar_expedientes_caso(body.row, body.expedientes, progreso)
 
-    job_id = request.app.state.jobs.run(tarea, kind="descarga_echasqui", num_doc=num_doc)
+    job_id = request.app.state.jobs.run(tarea, kind="descarga_repositorio", num_doc=num_doc)
     return JobResponse(job_id=job_id)
 
 
@@ -176,36 +176,36 @@ def descargar_ejercicios(body: DescargaEjerciciosRequest, request: Request) -> J
     return JobResponse(job_id=job_id)
 
 
-@router.post("/rsirat-ref", response_model=JobResponse)
-def descargar_rsirat_ref(body: RsiratMasivoRequest, request: Request) -> JobResponse:
-    """Descarga REF/Tiempos de las filas seleccionadas vía RSIRAT (job)."""
-    from MACRO.flujos.flujo_rsirat import descargar_ref_tiempos_rsirat
+@router.post("/sistema-legacy-ref", response_model=JobResponse)
+def descargar_sistema_legacy_ref(body: SistemaLegacyMasivoRequest, request: Request) -> JobResponse:
+    """Descarga REF/Tiempos de las filas seleccionadas vía SISTEMA_LEGACY (job)."""
+    from MACRO.flujos.flujo_sistema_legacy import descargar_ref_tiempos_sistema_legacy
 
     def tarea(progreso):
-        return descargar_ref_tiempos_rsirat(body.filas, callback_progreso=progreso)
+        return descargar_ref_tiempos_sistema_legacy(body.filas, callback_progreso=progreso)
 
-    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="rsirat_ref"))
+    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="sistema_legacy_ref"))
 
 
-@router.post("/rsirat-antecedentes", response_model=JobResponse)
-def descargar_rsirat_antecedentes(body: RsiratMasivoRequest, request: Request) -> JobResponse:
-    """Descarga los antecedentes de fiscalización (Fichas REF) vía RSIRAT (job)."""
-    from MACRO.flujos.flujo_rsirat import descargar_antecedentes_rsirat
+@router.post("/sistema-legacy-antecedentes", response_model=JobResponse)
+def descargar_sistema_legacy_antecedentes(body: SistemaLegacyMasivoRequest, request: Request) -> JobResponse:
+    """Descarga los antecedentes de fiscalización (Fichas REF) vía SISTEMA_LEGACY (job)."""
+    from MACRO.flujos.flujo_sistema_legacy import descargar_antecedentes_sistema_legacy
 
     def tarea(progreso):
-        return descargar_antecedentes_rsirat(body.filas, callback_progreso=progreso)
+        return descargar_antecedentes_sistema_legacy(body.filas, callback_progreso=progreso)
 
-    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="rsirat_antec"))
+    return JobResponse(job_id=request.app.state.jobs.run(tarea, kind="sistema_legacy_antec"))
 
 
-@router.post("/rsirat-preflight")
-def preflight_rsirat(body: RsiratPreflightRequest) -> dict:
-    """Qué casos de la selección requieren correr RSIRAT y cuáles ya están descargados.
+@router.post("/sistema-legacy-preflight")
+def preflight_sistema_legacy(body: SistemaLegacyPreflightRequest) -> dict:
+    """Qué casos de la selección requieren correr SISTEMA_LEGACY y cuáles ya están descargados.
 
     Síncrono (no crea job): lo consulta la ventana de confirmación antes de lanzar
     la automatización. Para 'antec' parsea el planeamiento de cada caso, así que
     puede tardar un par de segundos con selecciones grandes.
     """
-    from MACRO.flujos.flujo_rsirat import verificar_pendientes_rsirat
+    from MACRO.flujos.flujo_sistema_legacy import verificar_pendientes_sistema_legacy
 
-    return verificar_pendientes_rsirat(body.tipo, body.filas)
+    return verificar_pendientes_sistema_legacy(body.tipo, body.filas)

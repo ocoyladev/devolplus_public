@@ -62,14 +62,35 @@ def evaluar_conflicto_c64(resultado_caso, c64) -> bool:
 
 
 def prechequear_autorizar(lines):
-    """Valida las entradas antes de aplicarlas y reporta conflictos."""
+    """Valida las entradas y separa los conflictos por casilla.
+
+    Devuelve ``{"c65": [...], "c64": [...], ...}``: el router los mapea a
+    ``ConflictoAutorizar`` (num_doc, per_doc, nombre, c89) y ``ConflictoC64``.
+    """
+    from MACRO.flujos._demo import adaptador
+
     decisiones, errores = parsear_entradas_autorizar(lines)
-    conflictos = [d for d in decisiones if not d["resultado"]]
+    por_num_doc = {str(c.get("num_doc")): c for c in adaptador().listar_casos()}
+
+    c65, c64 = [], []
+    for d in decisiones:
+        fila = por_num_doc.get(d["num_doc"], {})
+        base = {
+            "num_doc": d["num_doc"],
+            "per_doc": str(fila.get("per_doc", "")),
+            "nombre": str(fila.get("ddp_nombre", "")),
+        }
+        monto = d["monto"]
+        if evaluar_conflicto_autorizar(d["resultado"], c89=monto, c65=0):
+            c65.append({**base, "c89": monto})
+        if evaluar_conflicto_c64(d["resultado"], c64=0):
+            c64.append({**base, "g58": 0.0})
     return {
         "ok": not errores,
         "decisiones": decisiones,
         "errores": errores,
-        "conflictos": conflictos,
+        "c65": c65,
+        "c64": c64,
         "mensaje": f"{len(decisiones)} decisión(es) leída(s), {len(errores)} error(es)",
     }
 

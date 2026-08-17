@@ -11,7 +11,7 @@ import {
   type DescargaCola,
 } from "../../api/mantenimiento";
 import { useTareaLock } from "../tareas/tareaLock";
-import { ArchivarEchasquiPanel } from "../archivo-echasqui/ArchivarEchasquiPanel";
+import { ArchivarRepositorioPanel } from "../archivo-repositorio/ArchivarRepositorioPanel";
 import type { EstadoFirmaAuto } from "../entorno/useFirmaAuto";
 
 interface Props {
@@ -35,7 +35,7 @@ export function MantenimientoPanel({
 }: Props): JSX.Element {
   const [seccion, setSeccion] = useState<"descargas" | "borrado" | null>(null);
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const [echasquiAbierto, setEchasquiAbierto] = useState(false);
+  const [repositorioAbierto, setRepositorioAbierto] = useState(false);
   const [descargas, setDescargas] = useState<DescargaCola[]>([]);
   const [sel, setSel] = useState<Set<number>>(new Set());
   const [confirmBd, setConfirmBd] = useState("");
@@ -191,9 +191,9 @@ export function MantenimientoPanel({
               </button>
               <button
                 className="block w-full px-3 py-1.5 text-left hover:bg-slate-100"
-                onClick={() => { setMenuAbierto(false); setEchasquiAbierto(true); }}
+                onClick={() => { setMenuAbierto(false); setRepositorioAbierto(true); }}
               >
-                ECHASQUI
+                REPOSITORIO
               </button>
               <button
                 className="block w-full px-3 py-1.5 text-left hover:bg-slate-100"
@@ -407,9 +407,9 @@ export function MantenimientoPanel({
           </div>
         </div>
       ) : null}
-      <ArchivarEchasquiPanel
-        abierto={echasquiAbierto}
-        onCerrar={() => setEchasquiAbierto(false)}
+      <ArchivarRepositorioPanel
+        abierto={repositorioAbierto}
+        onCerrar={() => setRepositorioAbierto(false)}
         onAviso={onAviso}
         onJobIniciado={onJobIniciado}
       />

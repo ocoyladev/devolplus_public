@@ -94,7 +94,7 @@ def create_app(static_dir: Path | None = None) -> FastAPI:
         descargas,
         entorno,
         generar,
-        itop,
+        mesa_ayuda,
         mantenimiento,
         procesos,
         servicios,
@@ -109,7 +109,7 @@ def create_app(static_dir: Path | None = None) -> FastAPI:
     app.include_router(config.router)
     app.include_router(acceso.router)
     app.include_router(servicios.router)
-    app.include_router(itop.router)
+    app.include_router(mesa_ayuda.router)
     app.include_router(generar.router)
     app.include_router(sync.router)
     app.include_router(mantenimiento.router)

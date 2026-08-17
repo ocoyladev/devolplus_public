@@ -39,10 +39,10 @@ function caso(alertas: AlertaValidacion[], extra: Partial<CasoValidacion> = {}):
   return {
     num_doc: "D1", num_dev: "", num_ruc: "", nombre: "ACME", of_devolucion: "OF1",
     tipo_exp: "ELECTRONICO", cod_tip_sol: "02", es_tipo12: false, origen_tipo12: "",
-    is_of_multiple: false, carpeta_existe: true, paso_pptt: false,
+    is_of_multiple: false, carpeta_existe: true, paso_papeles_trabajo: false,
     insumo_final: { completo: false, faltantes: [], puede_foliar: false },
-    exp_echasqui: { registrado: true, valor: "", autoregistrado: false },
-    echasquis: [],
+    exp_repositorio: { registrado: true, valor: "", autoregistrado: false },
+    repositorios: [],
     carga_1649: {
       aplica: true,
       local: { reportes: false, cedula: false },
@@ -61,7 +61,7 @@ function caso(alertas: AlertaValidacion[], extra: Partial<CasoValidacion> = {}):
 
 test("muestra los casos validados y el nivel", async () => {
   vi.spyOn(procesos, "validarArchivo").mockResolvedValue([
-    caso([{ codigo: "sin_pptt", severidad: "error", mensaje: "No pasó por PPTT.", accion: "pptt" }]),
+    caso([{ codigo: "sin_papeles_trabajo", severidad: "error", mensaje: "No pasó por PAPELES_TRABAJO.", accion: "papeles_trabajo" }]),
   ]);
 
   render(
@@ -75,21 +75,21 @@ test("muestra los casos validados y el nivel", async () => {
   );
 
   await waitFor(() => expect(screen.getByText(/ACME/)).toBeInTheDocument());
-  expect(screen.getByText(/No pasó por PPTT/)).toBeInTheDocument();
+  expect(screen.getByText(/No pasó por PAPELES_TRABAJO/)).toBeInTheDocument();
 });
 
-test("el echasqui pendiente se sube por vía especial, no carga el expediente", async () => {
+test("el repositorio pendiente se sube por vía especial, no carga el expediente", async () => {
   vi.spyOn(procesos, "validarArchivo").mockResolvedValue([
     caso(
       [{
-        codigo: "echasqui_item", severidad: "advertencia",
-        mensaje: "Echasqui '000-URD999-2026-611260-1' no figura en el expediente electrónico.",
-        accion: "subir_echasqui", item: "000-URD999-2026-611260-1",
+        codigo: "repositorio_item", severidad: "advertencia",
+        mensaje: "Repositorio '000-URD999-2026-611260-1' no figura en el expediente electrónico.",
+        accion: "subir_repositorio", item: "000-URD999-2026-611260-1",
       }],
       { num_dev: "50020261757051", num_ruc: "10402973846", nivel: "advertencia" },
     ),
   ]);
-  const subir = vi.spyOn(procesos, "subirEchasquiPendientes").mockResolvedValue("job1");
+  const subir = vi.spyOn(procesos, "subirRepositorioPendientes").mockResolvedValue("job1");
   const cargar = vi.spyOn(procesos, "cargaExpedientes").mockResolvedValue("job2");
 
   render(
@@ -102,7 +102,7 @@ test("el echasqui pendiente se sube por vía especial, no carga el expediente", 
     />,
   );
 
-  const boton = await screen.findByRole("button", { name: /Subir echasqui al expediente/ });
+  const boton = await screen.findByRole("button", { name: /Subir repositorio al expediente/ });
   fireEvent.click(boton);
 
   await waitFor(() =>

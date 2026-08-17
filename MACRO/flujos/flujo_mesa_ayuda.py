@@ -1,7 +1,7 @@
 """Registro de tickets en el sistema de mesa de ayuda (modo demostración).
 
 Toda la lógica de armado y validación de los tickets es real (vive en
-:mod:`MACRO.itop.tickets`); lo único que sustituye el modo demo es el envío:
+:mod:`MACRO.mesa_ayuda.tickets`); lo único que sustituye el modo demo es el envío:
 :func:`registrar_ticket` no hace ninguna llamada remota y devuelve un
 identificador simulado.
 """
@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from MACRO.itop import periodos, tickets
-from MACRO.itop.tickets import DatosModificar, DatosTicket, requiere_cci
+from MACRO.mesa_ayuda import periodos, tickets
+from MACRO.mesa_ayuda.tickets import DatosModificar, DatosTicket, requiere_cci
 
 # Tipos de ticket de descarga admitidos.
 TIPOS_DESCARGA: tuple[str, ...] = ("4ta", "5ta", "601", "601_completo")
@@ -48,7 +48,7 @@ def _num_doc(row: dict) -> str:
 
 
 def necesita_cci(modalidad: str) -> bool:
-    """Reexporta la regla de negocio de :mod:`MACRO.itop.tickets`."""
+    """Reexporta la regla de negocio de :mod:`MACRO.mesa_ayuda.tickets`."""
     return requiere_cci(modalidad)
 
 

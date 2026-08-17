@@ -111,9 +111,9 @@ def test_post_cargar_archivo_lanza_job_por_tipo() -> None:
     client = TestClient(app)
     resp = client.post(
         "/api/datos/cargar-archivo",
-        data={"tipo": "rsirat"},
+        data={"tipo": "sistema_legacy"},
         files={"file": ("reporte.xlsx", b"datos", "application/vnd.ms-excel")},
     )
     assert resp.status_code == 200
     assert resp.json() == {"job_id": "job-xyz"}
-    assert fake.calls == ["cargar_rsirat"]
+    assert fake.calls == ["cargar_sistema_legacy"]

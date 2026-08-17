@@ -52,13 +52,31 @@ class DemoAdapter:
         return sesion, cookie
 
     # --- lectura ---------------------------------------------------------
-    def listar_casos(self, *, archivados: bool = False) -> list[dict]:
-        from MACRO.database import obtener_tabla_asign, obtener_tabla_bd
+    @staticmethod
+    def _registros(df) -> list[dict]:
+        """Normaliza a lista de dicts lo que las funciones de BD devuelven.
 
-        filas = obtener_tabla_asign() if archivados is False else []
-        if not filas:
-            filas = obtener_tabla_bd()
-        return list(filas or [])
+        ``obtener_tabla_*`` devuelve un DataFrame (o ``None`` si la tabla no
+        existe todavía), no una lista.
+        """
+        if df is None or getattr(df, "empty", True):
+            return []
+        return df.to_dict(orient="records")
+
+    def listar_casos(self, *, archivados: bool = False) -> list[dict]:
+        from MACRO.database import (
+            obtener_tabla_asign,
+            obtener_tabla_asign_incluye_archivo,
+            obtener_tabla_bd,
+        )
+
+        if archivados:
+            todos = self._registros(obtener_tabla_asign_incluye_archivo())
+            vigentes = {str(c.get("num_doc")) for c in self._registros(obtener_tabla_asign())}
+            return [c for c in todos if str(c.get("num_doc")) not in vigentes]
+
+        filas = self._registros(obtener_tabla_asign())
+        return filas or self._registros(obtener_tabla_bd())
 
     def cargar_casos(self, num_docs: list[str], progreso: Any = None) -> dict:
         """Alta de casos: en demo se toman del catálogo sintético ya sembrado."""

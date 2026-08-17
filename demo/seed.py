@@ -141,37 +141,35 @@ def generar_casos(cantidad: int = 60, semilla: int = 20260817) -> list[dict[str,
     return casos
 
 
-def sembrar(db_path: str | None = None, cantidad: int = 60) -> int:
+def sembrar(cantidad: int = 60, forzar: bool = False) -> int:
     """Siembra la BD local con casos sintéticos. Devuelve cuántos insertó.
 
-    Es idempotente: si la tabla ya tiene filas, no hace nada. Para regenerar,
-    borre el archivo de base de datos y vuelva a llamar.
-    """
-    import sqlite3
+    Usa las mismas funciones de persistencia que la aplicación
+    (``persistir_tabla_bd`` / ``persistir_tabla_asign``), que derivan el esquema
+    del DataFrame; no escribe SQL propio, para no duplicar la definición de las
+    tablas ni desincronizarse de ella.
 
-    from MACRO.database import DB_FILE, init_db
+    Idempotente: si ya hay casos cargados no hace nada, salvo ``forzar=True``.
+    """
+    import pandas as pd
+
+    from MACRO.database import (
+        init_db,
+        obtener_tabla_bd,
+        persistir_tabla_asign,
+        persistir_tabla_bd,
+    )
 
     init_db()
-    conn = sqlite3.connect(db_path or DB_FILE)
-    try:
-        ya = conn.execute("SELECT COUNT(*) FROM tabla_bd").fetchone()[0]
-        if ya:
+    if not forzar:
+        actual = obtener_tabla_bd()
+        if actual is not None and not actual.empty:
             return 0
-        casos = generar_casos(cantidad)
-        cols = [
-            "of_devolucion", "num_doc", "num_ruc", "ddp_nombre", "fec_doc",
-            "cod_tri", "desc_tributo", "per_doc", "cod_tip_sol",
-            "mto_solicitado", "cod_dep", "num_dev", "cod_for", "cod_for_aso",
-        ]
-        conn.executemany(
-            f"INSERT INTO tabla_bd ({','.join(cols)}) "
-            f"VALUES ({','.join('?' * len(cols))})",
-            [tuple(c[k] for k in cols) for c in casos],
-        )
-        conn.commit()
-        return len(casos)
-    finally:
-        conn.close()
+
+    df = pd.DataFrame(generar_casos(cantidad))
+    persistir_tabla_bd(df)
+    persistir_tabla_asign(df)
+    return len(df)
 
 
 if __name__ == "__main__":  # pragma: no cover

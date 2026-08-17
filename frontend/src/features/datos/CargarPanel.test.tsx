@@ -27,13 +27,13 @@ test("envía los num_docs parseados y notifica el job", async () => {
   await vi.waitFor(() => expect(onJob).toHaveBeenCalledWith("cargar_datos"));
 });
 
-test("deshabilita 'Archivo RSIRAT' cuando el planeamiento está bloqueado", async () => {
+test("deshabilita 'Archivo SISTEMA_LEGACY' cuando el planeamiento está bloqueado", async () => {
   vi.mocked(datos.planeamientoEstado).mockResolvedValueOnce(false);
   render(<CargarPanel onJobIniciado={() => {}} onError={() => {}} />);
   fireEvent.click(screen.getByText("Cargar datos"));
   await waitFor(() => {
     const input = screen
-      .getByText("Archivo RSIRAT")
+      .getByText("Archivo SISTEMA_LEGACY")
       .querySelector("input") as HTMLInputElement;
     expect(input.disabled).toBe(true);
   });

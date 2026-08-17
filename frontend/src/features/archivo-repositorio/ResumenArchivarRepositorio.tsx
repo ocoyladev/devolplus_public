@@ -12,8 +12,8 @@ const BADGE: Record<DetalleArchivar["resultado"], { txt: string; cls: string }> 
   error: { txt: "Error", cls: "bg-red-100 text-red-800" },
 };
 
-/** Ventana emergente con el detalle de "Archivar ECHASQUI" (uno por echasqui). */
-export function ResumenArchivarEchasqui({ detalle, onClose }: Props): JSX.Element | null {
+/** Ventana emergente con el detalle de "Archivar REPOSITORIO" (uno por repositorio). */
+export function ResumenArchivarRepositorio({ detalle, onClose }: Props): JSX.Element | null {
   if (!detalle) return null;
   const cuenta = (r: DetalleArchivar["resultado"]): number =>
     detalle.filter((d) => d.resultado === r).length;
@@ -26,7 +26,7 @@ export function ResumenArchivarEchasqui({ detalle, onClose }: Props): JSX.Elemen
     >
       <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl">
         <div className="rounded-t-lg bg-slate-800 px-5 py-3 text-white">
-          <h2 className="text-base font-semibold">Archivar ECHASQUI — resumen</h2>
+          <h2 className="text-base font-semibold">Archivar REPOSITORIO — resumen</h2>
         </div>
         <div className="max-h-[60vh] overflow-y-auto px-5 py-4 text-sm text-slate-700">
           <p className="mb-3 text-slate-600">
@@ -34,7 +34,7 @@ export function ResumenArchivarEchasqui({ detalle, onClose }: Props): JSX.Elemen
             Pendientes {cuenta("pendiente")} · Errores {cuenta("error")}
           </p>
           {detalle.length === 0 ? (
-            <p className="text-slate-500">No había echasqui para archivar.</p>
+            <p className="text-slate-500">No había repositorio para archivar.</p>
           ) : (
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-100">

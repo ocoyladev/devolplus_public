@@ -69,7 +69,7 @@ def test_job_que_retorna_exito_true_incluye_mensaje() -> None:
     assert done["mensaje"] == "documento generado"
 
 
-def test_job_pptt_exito_parcial_propaga_errores_y_ok_count() -> None:
+def test_job_papeles_trabajo_exito_parcial_propaga_errores_y_ok_count() -> None:
     eventos, emit = _collector()
     jm = JobManager(emit)
 
@@ -78,21 +78,21 @@ def test_job_pptt_exito_parcial_propaga_errores_y_ok_count() -> None:
             "exito": True,
             "mensaje": "1/2 caso(s) OK. 1 con error.",
             "ok_count": 1,
-            "errores": [{"caso": "OF 9 · doc 3", "motivo": "PPTT falló tras 3 intentos"}],
+            "errores": [{"caso": "OF 9 · doc 3", "motivo": "PAPELES_TRABAJO falló tras 3 intentos"}],
         }
 
-    job_id = jm.run(tarea, kind="pptt")
+    job_id = jm.run(tarea, kind="papeles_trabajo")
     jm.join(job_id, timeout=5)
 
     done = eventos[-1]
     assert done["ok"] is True
     assert done["ok_count"] == 1
     assert done["errores"] == [
-        {"caso": "OF 9 · doc 3", "motivo": "PPTT falló tras 3 intentos"}
+        {"caso": "OF 9 · doc 3", "motivo": "PAPELES_TRABAJO falló tras 3 intentos"}
     ]
 
 
-def test_job_pptt_todo_falla_propaga_errores_en_done_fallido() -> None:
+def test_job_papeles_trabajo_todo_falla_propaga_errores_en_done_fallido() -> None:
     eventos, emit = _collector()
     jm = JobManager(emit)
 
@@ -104,7 +104,7 @@ def test_job_pptt_todo_falla_propaga_errores_en_done_fallido() -> None:
             "errores": [{"caso": "OF 9", "motivo": "MACRO.xlsx no encontrado"}],
         }
 
-    job_id = jm.run(tarea, kind="pptt")
+    job_id = jm.run(tarea, kind="papeles_trabajo")
     jm.join(job_id, timeout=5)
 
     done = eventos[-1]
@@ -171,7 +171,7 @@ def test_job_con_excepcion_emite_done_con_error() -> None:
         progreso("empezando")
         raise ValueError("algo falló")
 
-    job_id = jm.run(tarea, kind="pptt")
+    job_id = jm.run(tarea, kind="papeles_trabajo")
     jm.join(job_id, timeout=5)
 
     assert eventos[0]["type"] == "progress"

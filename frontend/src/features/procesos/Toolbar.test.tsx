@@ -8,10 +8,10 @@ vi.mock("../../api/acciones", () => ({
   procesos: {
     archivar: vi.fn(async () => "job-1"),
     recuperar: vi.fn(async () => "job-2"),
-    pptt: vi.fn(async () => "job-3"),
+    papeles_trabajo: vi.fn(async () => "job-3"),
     cargaExpedientes: vi.fn(async () => "job-4"),
     autorizar: vi.fn(async () => "job-5"),
-    archivarEchasqui: vi.fn(async () => "job-6"),
+    archivarRepositorio: vi.fn(async () => "job-6"),
   },
 }));
 
@@ -30,7 +30,7 @@ test("botones deshabilitados sin selección", () => {
     />,
   );
   expect(screen.getByText("Archivar")).toBeDisabled();
-  expect(screen.getByText("Generar PPTT")).toBeDisabled();
+  expect(screen.getByText("Generar PAPELES_TRABAJO")).toBeDisabled();
 });
 
 test("Archivar invoca procesos.archivar con la selección y notifica el job", async () => {
@@ -51,7 +51,7 @@ test("Archivar invoca procesos.archivar con la selección y notifica el job", as
   await vi.waitFor(() => expect(onJob).toHaveBeenCalledWith("archivar"));
 });
 
-test("Archivar ECHASQUI invoca procesos.archivarEchasqui con la selección", async () => {
+test("Archivar REPOSITORIO invoca procesos.archivarRepositorio con la selección", async () => {
   const onJob = vi.fn();
   render(
     <Toolbar
@@ -64,7 +64,7 @@ test("Archivar ECHASQUI invoca procesos.archivarEchasqui con la selección", asy
       onError={() => {}}
     />,
   );
-  fireEvent.click(screen.getByText("Archivar ECHASQUI"));
-  expect(procesos.archivarEchasqui).toHaveBeenCalledWith(["1", "2"]);
-  await vi.waitFor(() => expect(onJob).toHaveBeenCalledWith("archivar_echasqui"));
+  fireEvent.click(screen.getByText("Archivar REPOSITORIO"));
+  expect(procesos.archivarRepositorio).toHaveBeenCalledWith(["1", "2"]);
+  await vi.waitFor(() => expect(onJob).toHaveBeenCalledWith("archivar_repositorio"));
 });

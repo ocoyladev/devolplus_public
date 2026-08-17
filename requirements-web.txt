@@ -7,7 +7,7 @@ httpx==0.27.*
 oracledb>=2.0.0
 python-dotenv>=1.0.0
 pytest>=8
-# Automatización de escritorio SIRAT (RSIRAT: REF/Tiempos, Antecedentes). Solo
+# Automatización de escritorio sistema legacy (SISTEMA_LEGACY: REF/Tiempos, Antecedentes). Solo
 # Windows (pywinauto arrastra pywin32); marcadores para no romper pip en Linux.
 pywinauto; sys_platform == "win32"
 pyautogui; sys_platform == "win32"
