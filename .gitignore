@@ -1,0 +1,41 @@
+# Variables de entorno (nunca versionar)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# Bases de datos locales: contienen datos del usuario
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Salidas generadas en tiempo de ejecución
+*.xlsx
+*.pdf
+*.zip
+salida/
+
+# Capturas HAR: contienen credenciales y datos de sesión
+*.har
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+frontend/vitest.config.js
+frontend/vitest.config.d.ts
+admin_accesos/frontend/node_modules/
+admin_accesos/frontend/dist/
+admin_accesos/frontend/*.tsbuildinfo
+admin_accesos/frontend/vite.config.js
+admin_accesos/frontend/vite.config.d.ts

@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DEVOL+ · Manual de usuario</title>
+    <style>
+      :root {
+        --azul: #2563eb; --slate: #334155; --slate2: #64748b;
+        --bg: #f8fafc; --card: #ffffff; --line: #e2e8f0; --amber: #b45309;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0; background: var(--bg); color: var(--slate);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.6;
+      }
+      header.top {
+        background: #0f172a; color: #fff; padding: 20px 24px;
+      }
+      header.top h1 { margin: 0; font-size: 22px; }
+      header.top p { margin: 4px 0 0; color: #94a3b8; font-size: 14px; }
+      .wrap { display: flex; max-width: 1180px; margin: 0 auto; gap: 28px; padding: 24px; }
+      nav.toc {
+        flex: 0 0 240px; position: sticky; top: 24px; align-self: flex-start;
+        font-size: 14px; max-height: calc(100vh - 48px); overflow: auto;
+      }
+      nav.toc a { display: block; color: var(--slate2); text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+      nav.toc a:hover { background: #eef2ff; color: var(--azul); }
+      nav.toc .grp { font-weight: 600; color: var(--slate); margin-top: 12px; }
+      main { flex: 1; min-width: 0; }
+      section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px 26px; margin-bottom: 20px; }
+      h2 { font-size: 20px; color: #0f172a; margin: 0 0 6px; }
+      h3 { font-size: 16px; color: #0f172a; margin: 20px 0 6px; }
+      h4 { font-size: 14px; color: var(--slate); margin: 14px 0 4px; }
+      p, li { font-size: 15px; }
+      a { color: var(--azul); }
+      code { background: #f1f5f9; padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+      figure { margin: 14px 0; }
+      figure img { width: 100%; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+      figcaption { font-size: 13px; color: var(--slate2); margin-top: 6px; text-align: center; }
+      .callout { border-left: 4px solid var(--azul); background: #eff6ff; padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; }
+      .warn { border-left-color: var(--amber); background: #fffbeb; }
+      table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+      th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { color: var(--slate2); font-weight: 600; }
+      .tag { display: inline-block; background: #eef2ff; color: var(--azul); border-radius: 6px; padding: 1px 8px; font-size: 12px; font-weight: 600; }
+      .idx { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 16px; margin: 10px 0; }
+      .idx a { font-size: 14px; padding: 3px 0; }
+      .ficha { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 14px; }
+      .ficha h3 { margin-top: 0; scroll-margin-top: 16px; }
+      .ficha p { margin: 4px 0; }
+      .ficha .et { font-weight: 600; color: var(--slate); }
+      footer { text-align: center; color: var(--slate2); font-size: 13px; padding: 24px; }
+      @media (max-width: 860px) { nav.toc { display: none; } .wrap { padding: 14px; } }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <h1>DEVOL+ — Manual de usuario</h1>
+      <p>Guía funcional de la aplicación web. Cada función accesible desde la interfaz, explicada paso a paso.</p>
+    </header>
+
+    <div class="wrap">
+      <nav class="toc">
+        <div class="grp">Introducción</div>
+        <a href="#que-es">Qué es DEVOL+</a>
+        <a href="#distribucion">Distribución e instalación</a>
+        <a href="#pantalla">Resolución y firma automática</a>
+        <div class="grp">Primeros pasos</div>
+        <a href="#acceso">Acceso y solicitud</a>
+        <a href="#config">Configuración inicial</a>
+        <div class="grp">Uso diario</div>
+        <a href="#principal">Vista principal</a>
+        <a href="#cargar">Cargar datos</a>
+        <a href="#caso">Acciones del caso</a>
+        <a href="#mantenimiento">Mantenimiento</a>
+        <div class="grp">Referencia detallada</div>
+        <a href="#referencia">Índice de funciones</a>
+        <a href="#ref-cargar">Cargar datos (por fuente)</a>
+        <a href="#ref-pptt">Generar PPTT y su orden</a>
+        <a href="#ref-archivar">Archivar / Recuperar</a>
+        <a href="#ref-exp">Cargar expediente electrónico</a>
+        <a href="#ref-autorizar">Autorizar</a>
+        <a href="#ref-caso">Acciones del caso (detalle)</a>
+        <a href="#ref-otros">Otras acciones</a>
+        <div class="grp">Ayuda</div>
+        <a href="#soporte">Soporte</a>
+      </nav>
+
+      <main>
+        <section id="que-es">
+          <h2>Qué es DEVOL+</h2>
+          <p>
+            DEVOL+ es una aplicación de escritorio que automatiza tareas del proceso de
+            devoluciones: descarga de información, armado de expedientes (MACRO.xlsx),
+            generación de documentos (RI y Cartas), carga de expedientes electrónicos,
+            tickets iTop y reportes.
+          </p>
+          <p>
+            Aunque por dentro es una app web, se ejecuta como un <strong>programa de
+            escritorio</strong>: al abrir <code>DEVOL+.exe</code> se levanta un servidor
+            local y una ventana propia (WebView2). <strong>No se abre ninguna consola ni
+            terminal</strong> — la aplicación corre en modo silencioso (<code>console=false</code>).
+          </p>
+          <div class="callout">
+            El navegador/ventana muestra la interfaz que verás en este manual. Todo el
+            trabajo se hace desde botones y menús; no necesitas escribir comandos.
+          </div>
+        </section>
+
+        <section id="distribucion">
+          <h2>Distribución e instalación</h2>
+          <p>
+            La <strong>única forma válida de distribución es el ejecutable</strong>
+            <code>DEVOL+.exe</code>. No se instala con un asistente: se copia a la máquina
+            del usuario junto con sus carpetas de apoyo.
+          </p>
+
+          <h3>Estructura de despliegue</h3>
+          <p>El ejecutable debe ubicarse <strong>junto a la carpeta <code>RESOURCES</code></strong> y a sus carpetas de apoyo:</p>
+          <table>
+            <tr><th>Elemento</th><th>Descripción</th></tr>
+            <tr><td><code>DEVOL+.exe</code></td><td>La aplicación. Incluye embebido el frontend y este manual.</td></tr>
+            <tr><td><code>RESOURCES\</code></td><td>Plantillas que usa la app: <code>plantilla.xlsx</code> (base para generar <code>MACRO.xlsx</code>), y las plantillas de <strong>RI</strong> y <strong>Cartas</strong>, entre otros insumos.</td></tr>
+            <tr><td>Carpetas de trabajo</td><td>Descargas, RI, Autorizar y Archivo — se definen en <a href="#config">Configuración</a>.</td></tr>
+          </table>
+          <div class="callout warn">
+            Si falta la carpeta <code>RESOURCES</code> o alguna de sus plantillas, las
+            funciones que generan MACRO.xlsx, RI o Cartas no podrán completarse.
+          </div>
+
+          <h3>Requisitos de la máquina</h3>
+          <ul>
+            <li>Windows 10/11 con <strong>WebView2 Runtime</strong> (viene incluido en Windows actualizado).</li>
+            <li>Conexión a la red interna (para descargas) e Internet.</li>
+            <li>Aplicaciones de escritorio que la app orquesta (Excel, Outlook) según la tarea.</li>
+          </ul>
+        </section>
+
+        <section id="pantalla">
+          <h2>Resolución recomendada y firma automática</h2>
+          <p>
+            Varias funciones se ven mejor en pantallas amplias. Además, la
+            <strong>firma automática por coordenadas</strong> (al cargar expedientes
+            electrónicos) <strong>solo se habilita</strong> con una configuración de pantalla exacta:
+          </p>
+          <table>
+            <tr><th>Parámetro</th><th>Valor requerido</th></tr>
+            <tr><td>Escala de Windows</td><td><span class="tag">125%</span></td></tr>
+            <tr><td>Resolución física</td><td><span class="tag">1920 × 1200</span></td></tr>
+          </table>
+          <p>
+            Con cualquier otra escala o resolución, la casilla de firma automática
+            aparece deshabilitada y deberás firmar manualmente. Las capturas de este
+            manual se tomaron precisamente en esa configuración.
+          </p>
+        </section>
+
+        <section id="acceso">
+          <h2>Acceso y solicitud</h2>
+          <p>
+            DEVOL+ verifica automáticamente al usuario de Windows contra el sistema de
+            accesos. Pueden darse tres situaciones al abrir la app:
+          </p>
+          <h3>1. Usuario sin acceso → solicitar</h3>
+          <p>
+            Si es la primera vez, verás un formulario. Completa tu <strong>nombre
+            completo</strong> y, opcionalmente, tu correo, y pulsa <strong>Solicitar
+            acceso</strong>. Tu usuario de red ya viene detectado.
+          </p>
+          <figure>
+            <img src="img/06-solicitud.png" alt="Formulario de solicitud de acceso" />
+            <figcaption>Pantalla de solicitud de acceso (primer ingreso).</figcaption>
+          </figure>
+          <h3>2. Solicitud pendiente / rechazada / inactiva</h3>
+          <p>
+            Tras solicitar, tu acceso queda <strong>pendiente</strong> hasta que el autor
+            lo apruebe. Mientras tanto verás un mensaje de estado; usa <strong>Verificar de
+            nuevo</strong> una vez te confirmen la aprobación.
+          </p>
+          <figure>
+            <img src="img/07-pendiente.png" alt="Pantalla de estado pendiente" />
+            <figcaption>Estado de acceso pendiente de autorización.</figcaption>
+          </figure>
+          <h3>3. Usuario aprobado → entra directo</h3>
+          <p>Si tu acceso está aprobado, la app abre la vista principal sin pasos adicionales.</p>
+          <div class="callout">
+            Si no hay conexión con el sistema de accesos y ya habías sido aprobado
+            antes en ese equipo, podrás entrar igual; el registro de ingreso se guarda y
+            se sincroniza cuando vuelva la conexión.
+          </div>
+        </section>
+
+        <section id="config">
+          <h2>Configuración inicial</h2>
+          <p>
+            Antes de operar, abre <strong>Configuración</strong> (botón en la barra
+            superior) y define lo básico.
+          </p>
+          <figure>
+            <img src="img/02-configuracion.png" alt="Panel de configuración" />
+            <figcaption>Panel de Configuración: Rutas, Credenciales y Feriados.</figcaption>
+          </figure>
+          <h3>Rutas</h3>
+          <ul>
+            <li><strong>Descargas</strong>: carpeta donde se guardan los archivos descargados.</li>
+            <li><strong>RI</strong>: carpeta de trabajo de los RI generados.</li>
+            <li><strong>Autorizar</strong>: carpeta usada por el flujo de autorización.</li>
+            <li><strong>Archivo</strong>: carpeta destino al archivar casos.</li>
+            <li><strong>Unidad orgánica (folio)</strong>: código de la unidad (p. ej. <code>7EC400</code>) para el foliado.</li>
+          </ul>
+          <p>Usa el botón de carpeta 📁 a la derecha de cada ruta para elegirla con el explorador. Pulsa <strong>Guardar rutas</strong>.</p>
+          <h3>Credenciales</h3>
+          <p>
+            Guarda tus usuarios y contraseñas de <strong>Portal</strong> y
+            <strong>Workflow / iTop</strong>. Se usan para iniciar sesión en esos
+            sistemas durante las descargas. La contraseña nunca se muestra; deja
+            “(sin cambios)” si no quieres modificarla.
+          </p>
+          <h3>Feriados</h3>
+          <p>Registra los días no laborables que la app debe considerar en el cálculo de plazos.</p>
+        </section>
+
+        <section id="principal">
+          <h2>Vista principal</h2>
+          <p>La pantalla central lista los casos cargados y concentra todas las acciones.</p>
+          <figure>
+            <img src="img/01-vista-principal.png" alt="Vista principal de DEVOL+" />
+            <figcaption>Vista principal: barra superior, barra de acciones y tabla de casos.</figcaption>
+          </figure>
+
+          <h3>Barra superior</h3>
+          <table>
+            <tr><th>Control</th><th>Función</th></tr>
+            <tr><td><strong>Columnas básicas ▾</strong></td><td>Cambia la vista de la tabla: columnas básicas, toda la data, o la tabla de archivo.</td></tr>
+            <tr><td><strong>Actualizar ▾</strong></td><td>Sincroniza / refresca datos (macros y sincronización remota).</td></tr>
+            <tr><td><strong>Configuración</strong></td><td>Abre el panel de rutas, credenciales y feriados.</td></tr>
+            <tr><td><strong>Mantenimiento</strong></td><td>Cola de descargas y utilidades de limpieza (ver más abajo).</td></tr>
+            <tr><td><strong><a href="#ref-cargar">Cargar datos</a></strong></td><td>Incorpora casos por número de documento o desde archivos.</td></tr>
+            <tr><td><strong>Portal/E-Doc · Workflow</strong></td><td>Semáforos del estado de sesión en cada sistema.</td></tr>
+            <tr><td><strong><a href="#ref-verificar">Verificar login</a></strong></td><td>Inicia sesión con las credenciales guardadas y muestra si fue exitoso (semáforos).</td></tr>
+            <tr><td><strong><a href="#ref-actualizar">↻ Actualizar tabla</a></strong></td><td>Refresca la tabla de la interfaz con el estado más reciente.</td></tr>
+            <tr><td><strong><a href="#ref-descargas">↻ Descargas</a></strong></td><td>Reintenta las descargas pendientes en la cola.</td></tr>
+          </table>
+
+          <h3>Barra de acciones (sobre la selección)</h3>
+          <table>
+            <tr><th>Botón</th><th>Función</th></tr>
+            <tr><td><strong><a href="#ref-archivar">Archivar</a></strong></td><td>Mueve los casos seleccionados a la tabla de archivo.</td></tr>
+            <tr><td><strong><a href="#ref-recuperar">Recuperar</a></strong></td><td>Devuelve casos archivados a la tabla principal.</td></tr>
+            <tr><td><strong><a href="#ref-pptt">Generar PPTT</a></strong></td><td>Genera el papel de trabajo (PPTT) de los casos seleccionados.</td></tr>
+            <tr><td><strong><a href="#ref-exp">Cargar expediente electrónico</a></strong></td><td>Sube el expediente al sistema. La casilla contigua activa la <strong>firma automática</strong> (solo si la pantalla cumple 125% y 1920×1200).</td></tr>
+            <tr><td><strong><a href="#ref-autorizar">Autorizar</a></strong></td><td>Ejecuta el flujo de autorización para la selección.</td></tr>
+            <tr><td><strong><a href="#ref-mas">Más acciones ▾</a></strong></td><td>Registrar cartas y agregar numeración (foliado).</td></tr>
+          </table>
+
+          <h3>La tabla</h3>
+          <p>
+            Cada fila es un caso. Puedes filtrar por columna, ordenar, y editar en línea
+            campos como Resultado, Forma de devolución, Carta, RI y Observaciones. La
+            selección (casillas a la izquierda) determina sobre qué casos actúan los botones.
+          </p>
+        </section>
+
+        <section id="cargar">
+          <h2>Cargar datos</h2>
+          <p>El botón <strong>Cargar datos</strong> abre dos formas de incorporar casos
+          (ver <a href="#ref-cargar">detalle por fuente</a>):</p>
+          <figure>
+            <img src="img/04-cargar.png" alt="Panel de carga de datos" />
+            <figcaption>Panel Cargar datos: por número de documento o desde archivos.</figcaption>
+          </figure>
+          <ul>
+            <li><strong>Por número de documento</strong>: pega uno o varios números (uno por línea) y la app descarga su información.</li>
+            <li><strong>Desde archivos</strong>: <em>Archivo de asignación</em>, <em>Archivo RSIRAT</em> y <em>Archivo de autorización (RI)</em>.</li>
+          </ul>
+          <div class="callout">El botón de RSIRAT puede estar deshabilitado de lunes a viernes entre 08:00 y 17:00 (ventana no permitida para esa descarga).</div>
+        </section>
+
+        <section id="caso">
+          <h2>Acciones del caso</h2>
+          <p>
+            Al seleccionar <strong>un</strong> caso aparece el menú <strong>Acciones del
+            caso ▾</strong>, con todo lo que puedes hacer sobre él, agrupado
+            (ver <a href="#ref-caso">referencia detallada de cada acción</a>):
+          </p>
+          <figure>
+            <img src="img/05-acciones-caso.png" alt="Menú de acciones por caso" />
+            <figcaption>Menú desplegable “Acciones del caso” con sus grupos.</figcaption>
+          </figure>
+          <h4>Caso</h4>
+          <ul>
+            <li><strong>Descargar RI</strong> / <strong>Descargar Cartas</strong>: obtiene esos documentos del caso.</li>
+            <li><strong>Abrir carpeta</strong>: abre en el explorador la carpeta del caso.</li>
+            <li><strong>Abrir MACRO</strong>: abre el <code>MACRO.xlsx</code> del caso.</li>
+          </ul>
+          <h4>Generar Docs</h4>
+          <ul>
+            <li><strong>Carta</strong> / <strong>RI</strong>: genera el documento a partir de la plantilla de <code>RESOURCES</code>, permitiendo elegir modelo y plazo.</li>
+          </ul>
+          <h4>Descargas adicionales</h4>
+          <ul>
+            <li><strong>Por ejercicio(s)</strong>, <strong>3UIT - Casilla 514</strong>, <strong>Exp. Electrónico</strong>, <strong>E-Chasqui</strong>, <strong>Planeamiento</strong>: descargas específicas que se agregan al MACRO.xlsx o al expediente.</li>
+          </ul>
+          <h4>iTop</h4>
+          <ul>
+            <li><strong>Rentas 4ta</strong>, <strong>Rentas 5ta</strong>, <strong>PDT 601</strong>: generan el ticket iTop correspondiente.</li>
+            <li><strong>Modificar modalidad</strong>: ticket para cambiar la forma de devolución.</li>
+          </ul>
+        </section>
+
+        <section id="mantenimiento">
+          <h2>Mantenimiento</h2>
+          <p>El botón <strong>Mantenimiento</strong> abre utilidades de cola y limpieza.</p>
+          <figure>
+            <img src="img/03-mantenimiento.png" alt="Panel de mantenimiento" />
+            <figcaption>Panel de Mantenimiento: cola de descargas y zona peligrosa.</figcaption>
+          </figure>
+          <h3>Cola de descargas</h3>
+          <p>
+            Lista las descargas pendientes/fallidas. Puedes seleccionarlas y
+            <strong>ejecutar</strong> las seleccionadas o <strong>eliminarlas</strong> de la cola.
+          </p>
+          <h3>Zona peligrosa</h3>
+          <div class="callout warn">
+            Acciones irreversibles. Para evitar accidentes, exigen escribir un texto de
+            confirmación:
+            <ul>
+              <li><strong>Borrar todo</strong>: elimina todos los casos y la configuración local.</li>
+              <li><strong>Borrar descargas</strong>: vacía la cola de descargas.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="referencia">
+          <h2>Referencia detallada de funciones</h2>
+          <p>
+            Índice de funciones. Cada una explica <span class="et">qué hace</span>,
+            <span class="et">qué parámetros admite</span> y <span class="et">qué
+            resultado obtienes</span>. Haz clic para ir al detalle.
+          </p>
+          <div class="idx">
+            <a href="#ref-cargar-doc">Cargar por N° de documento</a>
+            <a href="#ref-cargar-asig">Cargar archivo de asignación</a>
+            <a href="#ref-cargar-rsirat">Cargar archivo RSIRAT</a>
+            <a href="#ref-cargar-ri">Cargar archivo de autorización (RI)</a>
+            <a href="#ref-pptt">Generar PPTT</a>
+            <a href="#ref-archivar">Archivar</a>
+            <a href="#ref-recuperar">Recuperar</a>
+            <a href="#ref-exp">Cargar expediente electrónico</a>
+            <a href="#ref-autorizar">Autorizar</a>
+            <a href="#ref-mas">Más acciones (Cartas / Numeración)</a>
+            <a href="#ref-verificar">Verificar login</a>
+            <a href="#ref-descargas">Reintentar descargas</a>
+            <a href="#ref-actualizar">Actualizar tabla</a>
+            <a href="#ref-c-ri">Descargar RI / Cartas</a>
+            <a href="#ref-c-abrir">Abrir carpeta / MACRO</a>
+            <a href="#ref-c-docs">Generar Docs (Carta / RI)</a>
+            <a href="#ref-c-adic">Descargas adicionales</a>
+            <a href="#ref-c-itop">iTop (Rentas / PDT 601 / Modalidad)</a>
+            <a href="#ref-mant">Mantenimiento</a>
+          </div>
+
+          <h3 id="ref-cargar" style="margin-top:22px">Cargar datos (según la fuente)</h3>
+          <p>
+            Las cuatro fuentes alimentan la misma tabla de casos; lo que cambia es
+            <span class="et">de dónde sale la lista de casos</span>. Al cargar, DEVOL+
+            no solo agrega las filas: por cada caso <span class="et">consulta su
+            información y descarga automáticamente los insumos disponibles a esa altura
+            del trámite</span> —el planeamiento, el formulario de la solicitud, el
+            documento de la OF, los documentos de la solicitud y, según el caso, el
+            expediente electrónico o virtual y reportes como RxH, ITF o las 3 UIT—, y
+            los deja ordenados en la <span class="et">carpeta de cada caso</span>,
+            dentro de la ruta de Descargas que fijaste en
+            <a href="#config">Configuración</a>. Las descargas se hacen en segundo
+            plano; las que fallen quedan en una cola que puedes reintentar (ver
+            <a href="#ref-descargas">Reintentar descargas</a>).
+          </p>
+          <div class="callout">
+            El <span class="et">RI y las cartas no se descargan en este paso</span>
+            (todavía no se conoce su número): se obtienen después, cuando ya existen,
+            con las acciones <a href="#ref-c-ri">«Descargar RI» y «Descargar Cartas»</a>
+            del caso.
+          </div>
+
+          <div class="ficha" id="ref-cargar-doc">
+            <h3>Cargar por N° de documento</h3>
+            <p>
+              Trae a la tabla los casos que tú indicas, escribiendo sus números de
+              documento (uno por línea). Es la vía rápida cuando necesitas casos
+              puntuales y no tienes un archivo. Internamente hace <span class="et">lo
+              mismo que «Archivo de asignación»</span>: busca cada caso en la
+              información central, completa sus datos en la tabla y lanza la descarga
+              completa de su contenido a la carpeta del caso.
+            </p>
+            <p><span class="et">Necesitas:</span> uno o varios números de documento, uno por línea.</p>
+            <p><span class="et">Obtienes:</span> los casos en la tabla con su información y sus documentos descargados. Si alguno ya estaba en el archivo, se te ofrece desarchivarlo en vez de duplicarlo.</p>
+          </div>
+          <div class="ficha" id="ref-cargar-asig">
+            <h3>Cargar archivo de asignación</h3>
+            <p>
+              Es la forma principal de traer <span class="et">tu carga de trabajo</span>.
+              A partir del Excel de asignación (el registro con los casos asignados al
+              auditor), DEVOL+ se queda solo con esos casos, cruza la información de
+              cada uno con los datos centrales, arma un reporte consolidado y
+              <span class="et">descarga los insumos de cada expediente</span>: el
+              planeamiento, el formulario de la solicitud, el documento de la OF, los
+              documentos de la solicitud y, según el caso, el expediente electrónico o
+              virtual y reportes como RxH, ITF o las 3 UIT. El RI y las cartas se
+              descargan aparte, con sus <a href="#ref-c-ri">acciones del caso</a>.
+            </p>
+            <p><span class="et">Necesitas:</span> el archivo Excel de asignación.</p>
+            <p><span class="et">Obtienes:</span> tus casos asignados en la tabla, cada uno con su carpeta de trabajo llena de los documentos descargados, listos para generar el PPTT.</p>
+          </div>
+          <div class="ficha" id="ref-cargar-rsirat">
+            <h3>Cargar archivo RSIRAT</h3>
+            <p>
+              Suma <span class="et">casos nuevos</span> detectados en el reporte RSIRAT.
+              DEVOL+ identifica de ese reporte la OF, el RUC y el nombre de cada caso, y
+              <span class="et">omite las OF que ya tienes cargadas</span> para no
+              duplicar trabajo; solo incorpora las que faltaban. Úsalo cuando el RSIRAT
+              muestra devoluciones que aún no están en tu tabla.
+            </p>
+            <p><span class="et">Necesitas:</span> el archivo del reporte RSIRAT.</p>
+            <p><span class="et">Obtienes:</span> los casos que faltaban, agregados a la tabla. <span class="et">Nota:</span> esta opción puede estar deshabilitada de lunes a viernes de 08:00 a 17:00 (horario en que esa consulta no está permitida).</p>
+          </div>
+          <div class="ficha" id="ref-cargar-ri">
+            <h3>Cargar archivo de autorización (RI)</h3>
+            <p>
+              Registra en tus casos el <span class="et">número de RI y su fecha</span> a
+              partir del Excel de autorización. No trae casos nuevos: actualiza los que
+              ya tienes, completando el RI y la fecha en cada fila. Úsalo cuando ya te
+              autorizaron los RI y quieres reflejarlos en la tabla.
+            </p>
+            <p><span class="et">Necesitas:</span> el archivo Excel de autorización (con los RI).</p>
+            <p><span class="et">Obtienes:</span> la columna «RI» y su fecha actualizadas en cada caso correspondiente.</p>
+          </div>
+
+          <div class="ficha" id="ref-pptt">
+            <h3>Generar PPTT</h3>
+            <p>
+              Arma el <span class="et">papel de trabajo y el expediente consolidado</span>
+              de los casos seleccionados. DEVOL+ toma los documentos de la carpeta del
+              caso, genera el PPTT y la reliquidación a partir del MACRO.xlsx, produce
+              la carátula, el índice y la cédula, y <span class="et">une todo en un solo
+              expediente ordenado</span>. Reconoce solo por el caso si es
+              <span class="et">electrónico</span>, <span class="et">físico</span> o
+              <span class="et">virtual</span> y aplica el armado que corresponde. Además
+              detecta los <span class="et">escritos ECHASQUI</span> del caso (los que el
+              contribuyente presentó por Mesa de Partes Virtual), los registra en la
+              columna «Exp. ECHASQUI» y los incorpora al expediente en su lugar.
+            </p>
+            <p><span class="et">Necesitas:</span> los casos seleccionados, con su carpeta y su MACRO.xlsx ya descargados. Si un escrito ECHASQUI está protegido con contraseña, se te puede pedir la clave (puedes omitir ese escrito).</p>
+            <p><span class="et">Orden del expediente:</span> el documento se arma siempre en este orden:</p>
+            <ol>
+              <li>Carátula</li>
+              <li>Índice</li>
+              <li>Cédula</li>
+              <li>Notificación del RI (y el RI, en virtuales)</li>
+              <li>Documento de referencia (REF)</li>
+              <li>Reporte de Tareas</li>
+              <li>Consulta de Detalle de Devoluciones</li>
+              <li>Cartas</li>
+              <li>Escritos ECHASQUI presentados</li>
+              <li>Intereses</li>
+              <li>Reliquidación</li>
+              <li>Documento de la OF y Formulario</li>
+              <li>Adeudos</li>
+              <li>Otros documentos</li>
+              <li>Papel de trabajo (PPTT)</li>
+              <li>Antecedentes</li>
+              <li>Planeamiento</li>
+            </ol>
+            <p><span class="et">Cómo colocar los archivos para que se reconozcan:</span> DEVOL+ ubica cada documento en su lugar <span class="et">por el nombre del archivo</span> dentro de la carpeta del caso. La carátula, el índice, la cédula, la reliquidación y el PPTT se generan solos; el resto, si lo agregas a mano, debe llamarse así (los que se descargan solos ya vienen con el nombre correcto):</p>
+            <table>
+              <tr><th>Documento</th><th>Cómo debe llamarse el archivo</th></tr>
+              <tr><td>Notificación del RI</td><td>empieza con <code>RI_</code> y termina en <code>_NOT.pdf</code></td></tr>
+              <tr><td>RI</td><td>empieza con <code>RI_</code> (y no termina en <code>_NOT</code>)</td></tr>
+              <tr><td>Documento de referencia</td><td><code>REF.pdf</code></td></tr>
+              <tr><td>Reporte de Tareas</td><td>empieza con <code>Reporte de Tareas</code></td></tr>
+              <tr><td>Consulta de Detalle de Devoluciones</td><td>empieza con <code>Consulta Detalle de Devoluciones</code></td></tr>
+              <tr><td>Cartas</td><td>empieza con <code>CARTA_</code></td></tr>
+              <tr><td>Escritos ECHASQUI</td><td>una carpeta <code>ECHASQUI</code> con una <span class="et">subcarpeta por escrito</span> (con su denominación); DEVOL+ une cada subcarpeta y la coloca aquí</td></tr>
+              <tr><td>Intereses</td><td>empieza con <code>INTERESES</code></td></tr>
+              <tr><td>Documento de la OF</td><td>termina en <code>_of.pdf</code></td></tr>
+              <tr><td>Formulario</td><td>termina en <code>_formulario.pdf</code></td></tr>
+              <tr><td>Adeudos</td><td>empieza con <code>ADEUDOS</code></td></tr>
+              <tr><td>Antecedentes</td><td>empieza con <code>ANTEC</code></td></tr>
+              <tr><td>Planeamiento</td><td>termina en <code>_planeamiento.pdf</code></td></tr>
+              <tr><td>Cualquier otro PDF</td><td>se ubica en el bloque «Otros documentos» (en orden alfabético)</td></tr>
+            </table>
+            <p>En los casos <span class="et">electrónicos</span> el orden se adapta al expediente electrónico (planeamiento, antecedentes, PPTT, reliquidación, cartas y escritos ECHASQUI, entre otros).</p>
+            <p><span class="et">Obtienes:</span> el expediente consolidado (y su versión foliada, en los virtuales) dentro de la carpeta del caso, listo para revisar o imprimir; y la columna «Exp. ECHASQUI» actualizada. Al terminar, aparece un <span class="et">resumen final</span> que indica cuántos casos salieron bien y el detalle de los que fallaron.</p>
+            <p><span class="et">Si algo falla:</span> cuando un paso de impresión no funciona, DEVOL+ lo <span class="et">reintenta</span>; si sigue fallando, ese caso <span class="et">se revierte por completo a su estado inicial</span> (la carpeta queda tal como estaba antes de intentar) y el proceso <span class="et">continúa con el resto de casos</span> sin detenerse.</p>
+          </div>
+
+          <div class="ficha" id="ref-archivar">
+            <h3>Archivar</h3>
+            <p>
+              Da por <span class="et">cerrado</span> un caso: lo retira de la tabla
+              principal y <span class="et">mueve su carpeta completa</span> desde la ruta
+              de Descargas a la ruta de Archivo (ambas se definen en
+              <a href="#config">Configuración</a>). El caso deja de estorbar en tu vista
+              de trabajo pero queda guardado y consultable en la vista «Tabla de archivo».
+            </p>
+            <p><span class="et">Necesitas:</span> los casos seleccionados. Si la OF tiene varios documentos (OF múltiple), deben estar <span class="et">todos</span> seleccionados; si falta alguno, esa OF no se archiva y se te avisa.</p>
+            <p><span class="et">Obtienes:</span> los casos fuera de la tabla principal (que <span class="et">se refresca sola</span> al terminar) y dentro de la vista de archivo, con su carpeta ya movida.</p>
+          </div>
+          <div class="ficha" id="ref-recuperar">
+            <h3>Recuperar</h3>
+            <p>
+              Es lo contrario de Archivar: <span class="et">devuelve a la tabla
+              principal</span> casos que habías archivado y regresa su carpeta desde la
+              ruta de Archivo a la de Descargas, para volver a trabajarlos.
+            </p>
+            <p><span class="et">Necesitas:</span> los casos seleccionados desde la vista «Tabla de archivo».</p>
+            <p><span class="et">Obtienes:</span> los casos de vuelta en la tabla principal, con su carpeta restaurada.</p>
+          </div>
+
+          <div class="ficha" id="ref-exp">
+            <h3>Cargar expediente electrónico</h3>
+            <p>
+              <span class="et">Sube el expediente del caso al sistema electrónico</span>
+              de Portal (solicitudes del formulario 1649). Toma los documentos ya
+              armados del caso y los presenta en el expediente electrónico de la
+              solicitud, evitando hacerlo a mano uno por uno.
+            </p>
+            <p><span class="et">Necesitas:</span> los casos seleccionados (con su expediente ya generado). La casilla contigua activa la <span class="et">firma automática</span>, que solo se habilita si tu pantalla está al 125% y 1920×1200 (ver <a href="#pantalla">Resolución y firma automática</a>); en caso contrario deberás firmar tú.</p>
+            <p><span class="et">Obtienes:</span> el expediente cargado en el sistema electrónico; con la firma automática activa, además queda firmado sin que intervengas.</p>
+          </div>
+
+          <div class="ficha" id="ref-autorizar">
+            <h3>Autorizar</h3>
+            <p>
+              Prepara la autorización de los casos y arma toda la documentación de
+              sustento en un solo paso. Con lo que ya tienes descargado y con lo
+              registrado en cada MACRO.xlsx, DEVOL+ produce tres cosas: un
+              <span class="et">Excel de autorización</span> (con una hoja «Cuadro»
+              resumen y una hoja por caso), el <span class="et">cálculo de intereses</span>
+              de cada caso, y un <span class="et">documento REF</span> con los
+              antecedentes del contribuyente. Antes de empezar, refresca el
+              «resultado» de cada caso leyéndolo de su MACRO.xlsx.
+            </p>
+
+            <h4>Cómo indicar los casos y las fechas</h4>
+            <p>
+              En el cuadro de texto escribes <span class="et">un caso por línea</span>.
+              Puedes solo poner el número o, si quieres fijar tú las fechas de
+              proyección, agregarlas separadas por una barra <code>|</code> (en formato
+              DD/MM/AAAA):
+            </p>
+            <table>
+              <tr><th>Cómo lo escribes</th><th>Qué significa</th></tr>
+              <tr><td><code>num_doc</code></td><td>Solo el caso. Las fechas se calculan solas (ver abajo).</td></tr>
+              <tr><td><code>num_doc | fecha_final</code></td><td>Fijas la fecha final de proyección. Debe ser hoy o posterior; si es anterior, se ignora y se calcula.</td></tr>
+              <tr><td><code>num_doc | fecha_inicial | fecha_final</code></td><td>Fijas ambas. Solo se aceptan si la inicial es anterior a hoy y la final es hoy o posterior; si no, se usan las calculadas.</td></tr>
+            </table>
+
+            <h4>Fechas por defecto (cuando no las escribes)</h4>
+            <ul>
+              <li><span class="et">Fecha inicial</span> (inicio del cómputo de intereses): se asigna según el <span class="et">año del periodo</span> del caso, con una fecha oficial por ejercicio (por ejemplo, 2023 → 12/06/2024; 2024 → 10/06/2025; 2025 → 11/06/2026). Si el año no está en esa tabla, se usa el 01/01 de ese año.</li>
+              <li><span class="et">Fecha final</span> (proyección del pago): se calcula sumando <span class="et">días hábiles</span> a partir de hoy —saltando sábados, domingos y los feriados que registraste en <a href="#config">Configuración</a>—: <span class="et">4 días hábiles si la forma de devolución es CHEQUE</span> y <span class="et">2 días hábiles</span> en los demás casos.</li>
+            </ul>
+
+            <h4>Cálculo de intereses</h4>
+            <p>
+              Se hace solo para los casos con resultado <span class="et">AUTORIZADO
+              TOTAL</span> o <span class="et">AUTORIZADO PARCIAL</span>. Toma el
+              <span class="et">monto autorizado</span> del MACRO.xlsx y calcula los
+              intereses entre la fecha inicial y la fecha final, generando un
+              <span class="et">INTERESES.pdf</span> en la carpeta del caso. Si la fecha
+              inicial resulta posterior a la final (aún no corre el periodo de
+              intereses), el interés queda en 0 y no se genera el PDF.
+            </p>
+
+            <h4>Montos que se consideran</h4>
+            <ul>
+              <li><span class="et">Monto autorizado:</span> el monto reconocido en el MACRO.xlsx del caso.</li>
+              <li><span class="et">Valores / deuda a aplicar:</span> los adeudos a compensar registrados en el MACRO.xlsx. Se <span class="et">topan</span> al monto total para que el monto a devolver nunca sea negativo.</li>
+              <li><span class="et">Intereses totales:</span> los calculados (redondeados).</li>
+              <li><span class="et">Monto total</span> = monto autorizado + intereses.</li>
+              <li><span class="et">Monto a devolver</span> = monto total − deuda aplicada.</li>
+            </ul>
+
+            <p><span class="et">Necesitas:</span> los casos escritos (uno por línea); su MACRO.xlsx con la hoja RELIQUIDADO y su planeamiento ya descargados; y las plantillas en la carpeta RESOURCES.</p>
+            <p><span class="et">Obtienes:</span> un Excel <code>FORMATO_CASOS_AUTORIZAR_(fecha).xlsx</code> en la ruta de Autorizar, con la hoja «Cuadro» (resultado, fechas, intereses, monto autorizado, valores, monto total y monto a devolver, con formato de moneda) y una hoja por caso; el <code>INTERESES.pdf</code> y el <code>REF</code> por caso; los importes calculados quedan además guardados en la tabla. El Excel se abre automáticamente al terminar.</p>
+          </div>
+
+          <div class="ficha" id="ref-mas">
+            <h3>Más acciones: Registrar cartas / Agregar numeración</h3>
+            <p>
+              <span class="et">Registrar cartas:</span> prepara el registro de las cartas
+              de los casos seleccionados (deja listo el texto/registro que luego se usa
+              para gestionarlas). <span class="et">Agregar numeración:</span> aplica la
+              numeración/foliado a las cartas ya generadas, dejándolas correlativas y
+              listas para su emisión.
+            </p>
+            <p><span class="et">Necesitas:</span> los casos seleccionados (con sus cartas ya generadas, para numerarlas).</p>
+            <p><span class="et">Obtienes:</span> las cartas registradas y/o numeradas.</p>
+          </div>
+
+          <h3 id="ref-otros" style="margin-top:22px">Otras acciones</h3>
+
+          <div class="ficha" id="ref-verificar">
+            <h3>Verificar login</h3>
+            <p>
+              Comprueba que DEVOL+ puede <span class="et">iniciar sesión</span> en
+              Portal y en Workflow con las credenciales que guardaste. Es una
+              revisión previa para asegurarte de que las descargas van a funcionar antes
+              de lanzarlas.
+            </p>
+            <p><span class="et">Necesitas:</span> nada más que hacer clic (usa las credenciales de <a href="#config">Configuración</a>).</p>
+            <p><span class="et">Obtienes:</span> los semáforos «Portal/E-Doc» y «Workflow» en verde (acceso correcto) o rojo (falló); si sale rojo, revisa tus credenciales.</p>
+          </div>
+          <div class="ficha" id="ref-descargas">
+            <h3>Reintentar descargas (↻ Descargas)</h3>
+            <p>
+              Cuando una descarga falla (por ejemplo, por una caída momentánea de un
+              sistema), queda anotada en una <span class="et">cola de pendientes</span>.
+              Este botón <span class="et">vuelve a intentar</span> todas esas descargas
+              pendientes, sin tener que recargar todo desde cero.
+            </p>
+            <p><span class="et">Necesitas:</span> nada; actúa sobre la cola existente.</p>
+            <p><span class="et">Obtienes:</span> las descargas que faltaban, completadas (las que sigan fallando permanecen en la cola). Puedes ver y administrar esa cola en <a href="#ref-mant">Mantenimiento</a>.</p>
+          </div>
+          <div class="ficha" id="ref-actualizar">
+            <h3>Actualizar tabla (↻)</h3>
+            <p>
+              Vuelve a leer los datos y <span class="et">refresca la tabla</span> que ves
+              en pantalla. No descarga ni cambia nada: solo sincroniza la vista con el
+              estado real. Útil si, tras una acción larga (por ejemplo, al terminar una
+              carga de datos), la tabla se quedó mostrando información antigua.
+            </p>
+            <p><span class="et">Necesitas:</span> nada.</p>
+            <p><span class="et">Obtienes:</span> la tabla mostrando el estado más reciente.</p>
+          </div>
+
+          <h3 id="ref-caso" style="margin-top:22px">Acciones del caso (detalle)</h3>
+          <p>Disponibles al seleccionar <span class="et">un solo caso</span>, desde el menú «Acciones del caso». Todo lo que descargan o generan queda en la carpeta de ese caso.</p>
+
+          <div class="ficha" id="ref-c-ri">
+            <h3>Descargar RI / Descargar Cartas</h3>
+            <p>
+              <span class="et">Descargar RI:</span> trae de Portal el RI del caso
+              <span class="et">y su notificación</span>, usando el número de RI que ya
+              figura en el caso. <span class="et">Descargar Cartas:</span> trae de
+              Portal las cartas indicadas <span class="et">y sus notificaciones</span>.
+              Sirven para obtener (o volver a obtener) esos documentos de forma puntual,
+              sin recargar todo el caso.
+            </p>
+            <p>
+              <span class="et">Formato de la casilla «Carta»:</span> antes de descargar
+              cartas, escribe en la columna <span class="et">Carta</span> del caso el o
+              los números en formato <code>número-año</code>, separados por coma. Por
+              ejemplo: <code>1234-2024, 5678-2024</code>. DEVOL+ completa el número a 7
+              dígitos y arma el código completo de cada carta (con el año y el código de
+              tu unidad) para pedirla.
+            </p>
+            <p>
+              <span class="et">Cómo se envía:</span> por cada carta, DEVOL+ registra la
+              descarga de la <span class="et">carta y de su notificación</span>, inicia
+              sesión en Portal con tus credenciales guardadas, ubica el documento en la
+              sección de notificaciones y lo descarga. Si un número está mal escrito (sin
+              el guion <code>número-año</code>), se descarta y se te avisa.
+            </p>
+            <p><span class="et">Necesitas:</span> el caso seleccionado; para cartas, los números en la columna «Carta» con el formato indicado; sesión válida en Portal.</p>
+            <p><span class="et">Obtienes:</span> el RI o las cartas, con sus notificaciones, guardados en la carpeta del caso.</p>
+          </div>
+          <div class="ficha" id="ref-c-abrir">
+            <h3>Abrir carpeta / Abrir MACRO</h3>
+            <p>
+              <span class="et">Abrir carpeta:</span> abre en el Explorador de Windows la
+              carpeta del caso, para revisar sus archivos. <span class="et">Abrir
+              MACRO:</span> abre directamente el archivo de cálculo MACRO.xlsx del caso.
+              No modifican nada: son atajos para acceder rápido.
+            </p>
+            <p><span class="et">Necesitas:</span> el caso seleccionado.</p>
+            <p><span class="et">Obtienes:</span> la carpeta o el archivo abiertos para revisarlos.</p>
+          </div>
+          <div class="ficha" id="ref-c-docs">
+            <h3>Generar Docs: Carta / RI</h3>
+            <p>
+              Redacta la <span class="et">Carta</span> o el <span class="et">RI</span> del
+              caso a partir de las plantillas oficiales, completándolas con los datos del
+              caso. Puedes <span class="et">elegir el modelo</span> (según el tipo de
+              carta/RI que necesites) y el <span class="et">plazo en días</span> cuando
+              aplique.
+            </p>
+            <p><span class="et">Necesitas:</span> el caso; el modelo a usar y, si corresponde, el plazo en días.</p>
+            <p><span class="et">Obtienes:</span> el documento generado en la carpeta del caso, listo para revisar.</p>
+          </div>
+          <div class="ficha" id="ref-c-adic">
+            <h3>Descargas adicionales</h3>
+            <p>Descargas específicas que se suman al expediente del caso:</p>
+            <ul>
+              <li><span class="et">Por ejercicio(s):</span> descarga la reliquidación de varios ejercicios (indicas cuántos), para ampliar el análisis a años anteriores del mismo contribuyente.</li>
+              <li><span class="et">3UIT - Casilla 514:</span> descarga la información de las 3 UIT (casilla 514) del contribuyente.</li>
+              <li><span class="et">Exp. Electrónico:</span> descarga (o vuelve a descargar) los documentos del expediente electrónico de la solicitud.</li>
+              <li><span class="et">E-Chasqui:</span> descarga los escritos ECHASQUI que el contribuyente presentó por Mesa de Partes Virtual, para poder incorporarlos al expediente.</li>
+              <li><span class="et">Planeamiento:</span> descarga desde Workflow el reporte de planeamiento del contribuyente (sus antecedentes y solicitudes).</li>
+            </ul>
+            <p><span class="et">Necesitas:</span> el caso; según la opción, la cantidad de ejercicios o el número de formulario.</p>
+            <p><span class="et">Obtienes:</span> los documentos descargados, agregados a la carpeta del caso.</p>
+          </div>
+          <div class="ficha" id="ref-c-itop">
+            <h3>iTop: Rentas 4ta / 5ta, PDT 601, Modificar modalidad</h3>
+            <p>
+              Registra por ti un <span class="et">ticket en iTop</span> para pedir
+              información o gestionar un cambio, sin tener que crearlo a mano:
+            </p>
+            <ul>
+              <li><span class="et">Rentas 4ta / Rentas 5ta:</span> ticket para solicitar la información de rentas de 4ta / 5ta categoría del contribuyente.</li>
+              <li><span class="et">PDT 601:</span> ticket para solicitar la información del PDT 601 (planilla / empleadores).</li>
+              <li><span class="et">Modificar modalidad:</span> ticket para cambiar la forma (modalidad) de la devolución del caso.</li>
+            </ul>
+            <p><span class="et">Necesitas:</span> el caso; para «Modificar modalidad», la nueva modalidad (y el CCI si corresponde).</p>
+            <p><span class="et">Obtienes:</span> el ticket iTop registrado, listo para su atención.</p>
+          </div>
+
+          <div class="ficha" id="ref-mant">
+            <h3>Mantenimiento</h3>
+            <p>
+              Reúne dos utilidades. La <span class="et">cola de descargas</span> lista las
+              descargas que quedaron pendientes o fallidas; puedes seleccionarlas y
+              <span class="et">ejecutarlas</span> de nuevo o <span class="et">eliminarlas</span>
+              de la cola. La <span class="et">zona peligrosa</span> permite
+              <span class="et">Borrar todo</span> (elimina todos los casos y la
+              configuración local, dejando el programa como recién instalado) o
+              <span class="et">Borrar descargas</span> (vacía la cola de descargas).
+            </p>
+            <p><span class="et">Necesitas:</span> seleccionar los pendientes a ejecutar/eliminar. Las acciones de la zona peligrosa te piden <span class="et">escribir un texto de confirmación</span> para evitar borrados accidentales.</p>
+            <p><span class="et">Obtienes:</span> las descargas seleccionadas ejecutadas o quitadas de la cola. <span class="et">Ojo:</span> las acciones de la zona peligrosa son <span class="et">irreversibles</span>.</p>
+          </div>
+        </section>
+
+        <section id="soporte">
+          <h2>Soporte</h2>
+          <p>
+            Para solicitar acceso, reportar un problema o pedir una mejora, contacta al
+            autor <a href="https://www.linkedin.com/in/ocoyladev" target="_blank" rel="noreferrer noopener">Oscar Coyla</a>.
+          </p>
+        </section>
+
+        <footer>
+          Diseñado por
+          <a href="https://www.linkedin.com/in/ocoyladev" target="_blank" rel="noreferrer noopener">Oscar Arnold Coyla Urquizo</a>
+
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
